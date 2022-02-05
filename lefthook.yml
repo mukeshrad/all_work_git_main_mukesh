@@ -1,0 +1,13 @@
+pre-push:
+  parallel: true
+  commands:
+#    tests:
+#      run: flutter test
+    linter:
+      run: flutter clean
+
+
+#pre-commit:
+#  commands:
+#    linter:
+#      run: flutter clean

@@ -216,369 +216,163 @@ class _BilPayState extends State<BilPay> {
           style: TextStyle(color: appBlackColor),
         ),
       ),
-      body: Column(
+      body: SingleChildScrollView(
+      child: Column(
         children: [
-          SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: appBlueGColor.withOpacity(0.6), //appBlueGColor.withOpacity(0.5),
-                  borderRadius: const BorderRadius.all(Radius.circular(15)),
-                ),
+          cardUser(),
+          Container(
+            // height: 170,
+            decoration: BoxDecoration(
+              border: Border.all(color: appGreyColor, width: 0.2),
+              borderRadius: const BorderRadius.all(Radius.circular(15)),
 
-                child: Container(
-                  // height: 170,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [Color(0xFF0E0E0E), Color(0xFF0E0E0E)]),
-                      border: Border.all(color: appGreyColor, width: 0.2),
-                      // color: Colors.blue,
-                      borderRadius: const BorderRadius.all(Radius.circular(15)),
-                      image: DecorationImage(
-                          opacity: 0.2,
-                          image: Image.asset("asset/Paymenticon/bgCard.jpeg", height: 20,width: 20,).image,
-                          fit: BoxFit.cover
-                      )
-                  ),
-                  child: Column(
-                    children:[
+              //       boxShadow: [
+              //   BoxShadow(
+              //   color: appGreyColor,
+              //   spreadRadius: 5,
+              //   blurRadius: 9,
+              //   offset: Offset(0, 2), // changes position of shadow
+              // ),
+              // ],
+
+            ),
+            margin: EdgeInsets.all(20),
+            child:  Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 10),
+
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+
                       Container(
                         // height:  40,
-                        padding: EdgeInsets.only(left: 20,right: 20,top: 15,bottom: 5),
 
-                        child:  Row(
-
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
+                        padding: EdgeInsets.only(left: 20),
+                        alignment: Alignment.centerLeft,
+                        child:  Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
                             Text(
-                              "My E-Card",
+                              "Payment Due",
                               style: TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.bold,color: appWhiteColor),
+                                  color: appGreyDarkColor,
+                                  fontWeight: FontWeight.normal),
                             ),
                             SizedBox(
                               height: 8,
                             ),
-
-
-                            Row(
-                              children: [
-
-                                Text(
-                                  "UPTR",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,color: appWhiteColor),
-                                ),
-
-
-
-                                Image.asset("assets/images/uptrackLogo.png",fit: BoxFit.cover,height: 15,),
-
-
-                                Text(
-                                  "CK",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,color: appWhiteColor),
-                                ),
-
-
-
-
-                              ],
+                            Text(
+                              "₹ 500",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold),
                             ),
-
-
-                            // Text(
-                            //   "UPTR CK",
-                            //   style: TextStyle(
-                            //       fontSize: 17,
-                            //       fontWeight: FontWeight.bold,color: appWhiteColor),
-                            // ),
                           ],
 
 
                         ),
 
+
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 10,bottom: 10),
+                        width: 0.1,
+                        height: 50,
+                        // height: double.infinity,
+                        color: appGreyDarkColor,
 
                       ),
                       Container(
                         // height:  40,
-                        padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 5),
+                        padding: EdgeInsets.only(right: 20),
                         child:  Column(
 
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
-                            Text(
-                              "Card Number",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: appGreyColor,
-                                  fontWeight: FontWeight.normal),
-                            ),
-                            SizedBox(
-                              height: 4,
-                            ),
-                            Text(
-                              "7987 8453 98",
-                              style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,color: appWhiteColor),
-                            ),
-                          ],
-
-
-                        ),
-
-
-                      ),
-                      Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          // crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
 
                           children: [
-
-                            Container(
-                              // height:  40,
-                              padding: EdgeInsets.only(left: 20),
-                              child:  Column(
-
-                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                // crossAxisAlignment: CrossAxisAlignment.center,
-                                children: const [
-                                  Text(
-                                    "Total Card Limit",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: appGreyColor,
-                                      fontWeight: FontWeight.normal,),
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                  Text(
-                                    "₹ 4000.00",
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,color: appWhiteColor),
-                                  ),
-                                ],
-
-
-                              ),
-
-
+                            Text(
+                              "Due Date",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: appGreyDarkColor,
+                                  fontWeight: FontWeight.normal),
                             ),
-                            Container(
-                              margin: EdgeInsets.only(top: 10,bottom: 10),
-                              width: 0.1,
-                              height: 50,
-                              // height: double.infinity,
-                              color: appGreyDarkColor,
 
+                            SizedBox(
+                              height: 8,
                             ),
-                            Container(
-                              // height:  40,
-                              padding: EdgeInsets.only(right: 20),
-                              child:  Column(
-
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: const [
-                                  Text(
-                                    "Weekly Limit",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: appGreyColor,
-                                        fontWeight: FontWeight.normal),
-                                  ),
-
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                  Text(
-                                    "₹ 1000.00",
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,color: appWhiteColor),
-                                  ),
-                                ],
-                              ),
-                            )
+                            Text(
+                              currentDate,
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
-                      ),
-
+                      )
                     ],
                   ),
                 ),
-              ),
-              Container(
-                // height: 170,
-                decoration: BoxDecoration(
-                  border: Border.all(color: appGreyColor, width: 0.2),
-                  borderRadius: const BorderRadius.all(Radius.circular(15)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                  child: TextFormField(
+                    showCursor: false,
+                    readOnly: false,
+                    controller: txtEnterAmount,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        filled: true,
+                        isDense: true,
+                        hintText: "₹ 500",
+                        labelText: 'Enter Amount',
+                        suffixIcon: IconButton(onPressed: (){
+                          print("Work");
+                          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectContacts()));
 
-                  //       boxShadow: [
-                  //   BoxShadow(
-                  //   color: appGreyColor,
-                  //   spreadRadius: 5,
-                  //   blurRadius: 9,
-                  //   offset: Offset(0, 2), // changes position of shadow
-                  // ),
-                  // ],
-
+                        }, icon: Container(), ),//,
+                        fillColor: Colors.grey.shade200),
+                  ),
                 ),
-                margin: EdgeInsets.all(20),
-                child:  Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(top: 10),
-
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-
-                          Container(
-                            // height:  40,
-
-                            padding: EdgeInsets.only(left: 20),
-                            alignment: Alignment.centerLeft,
-                            child:  Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  "Payment Due",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: appGreyDarkColor,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                Text(
-                                  "₹ 500",
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-
-
-                            ),
-
-
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10,bottom: 10),
-                            width: 0.1,
-                            height: 50,
-                            // height: double.infinity,
-                            color: appGreyDarkColor,
-
-                          ),
-                          Container(
-                            // height:  40,
-                            padding: EdgeInsets.only(right: 20),
-                            child:  Column(
-
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              // crossAxisAlignment: CrossAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-
-                              children: [
-                                Text(
-                                  "Due Date",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: appGreyDarkColor,
-                                      fontWeight: FontWeight.normal),
-                                ),
-
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                Text(
-                                  currentDate,
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                      child: TextFormField(
-                        showCursor: false,
-                        readOnly: false,
-                        controller: txtEnterAmount,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            filled: true,
-                            isDense: true,
-                            hintText: "₹ 500",
-                            labelText: 'Enter Amount',
-                            suffixIcon: IconButton(onPressed: (){
-                              print("Work");
-                              // Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectContacts()));
-
-                            }, icon: Container(), ),//,
-                            fillColor: Colors.grey.shade200),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-
-
-                    Container(
-                      height: 5,
-                      color: appGreyColor.withOpacity(0.5),
-                    ),
-                    Container(
-                      decoration: const BoxDecoration(
-                        // border: Border.all(color: Colors.grey,width: 1),
-                          color: appBlueGColor,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(15),
-                              bottomRight: Radius.circular(15))),
-
-                      height: 20,
-                      // color: Colors.black,
-                    ),
-
-                  ],
+                SizedBox(
+                  height: 15,
                 ),
-              ),
-
-              // Expanded(
-              //   child: Container(),
-              // ),
 
 
-            ],
+                Container(
+                  height: 5,
+                  color: appGreyColor.withOpacity(0.5),
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    // border: Border.all(color: Colors.grey,width: 1),
+                      color: appBlueGColor,
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(15),
+                          bottomRight: Radius.circular(15))),
+
+                  height: 20,
+                  // color: Colors.black,
+                ),
+
+              ],
+            ),
           ),
-        ),
-          Expanded(child: Container()),
+
+          // Expanded(
+          //   child: Container(),
+          // ),
+          // Expanded(child: Container()),
           Container(
             child: TextButton(
               onPressed: () {
@@ -603,9 +397,216 @@ class _BilPayState extends State<BilPay> {
               ),
             ),
           ),
-    ]
+
+        ],
+      ),
+        ),
+    );
+  }
+
+  Widget cardUser(){
+
+    return Container(
+      margin: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: appBlueGColor.withOpacity(0.6), //appBlueGColor.withOpacity(0.5),
+        borderRadius: const BorderRadius.all(Radius.circular(15)),
+      ),
+
+      child: Container(
+        // height: 170,
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [Color(0xFF0E0E0E), Color(0xFF0E0E0E)]),
+            border: Border.all(color: appGreyColor, width: 0.2),
+            // color: Colors.blue,
+            borderRadius: const BorderRadius.all(Radius.circular(15)),
+            image: DecorationImage(
+                opacity: 0.2,
+                image: Image.asset("asset/Paymenticon/bgCard.jpeg", height: 20,width: 20,).image,
+                fit: BoxFit.cover
+            )
+        ),
+        child: Column(
+          children:[
+            Container(
+              // height:  40,
+              padding: EdgeInsets.only(left: 20,right: 20,top: 15,bottom: 5),
+
+              child:  Row(
+
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "My E-Card",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,color: appWhiteColor),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+
+
+                  Row(
+                    children: [
+
+                      Text(
+                        "UPTR",
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,color: appWhiteColor),
+                      ),
+
+
+
+                      Image.asset("assets/images/uptrackLogo.png",fit: BoxFit.cover,height: 15,),
+
+
+                      Text(
+                        "CK",
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,color: appWhiteColor),
+                      ),
+
+
+
+
+                    ],
+                  ),
+
+
+                  // Text(
+                  //   "UPTR CK",
+                  //   style: TextStyle(
+                  //       fontSize: 17,
+                  //       fontWeight: FontWeight.bold,color: appWhiteColor),
+                  // ),
+                ],
+
+
+              ),
+
+
+            ),
+            Container(
+              // height:  40,
+              padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 5),
+              child:  Column(
+
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const [
+                  Text(
+                    "Card Number",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: appGreyColor,
+                        fontWeight: FontWeight.normal),
+                  ),
+                  SizedBox(
+                    height: 4,
+                  ),
+                  Text(
+                    "7987 8453 98",
+                    style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,color: appWhiteColor),
+                  ),
+                ],
+
+
+              ),
+
+
+            ),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+
+                children: [
+
+                  Container(
+                    // height:  40,
+                    padding: EdgeInsets.only(left: 20),
+                    child:  Column(
+
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Total Card Limit",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: appGreyColor,
+                            fontWeight: FontWeight.normal,),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          "₹ 4000.00",
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,color: appWhiteColor),
+                        ),
+                      ],
+
+
+                    ),
+
+
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10,bottom: 10),
+                    width: 0.1,
+                    height: 50,
+                    // height: double.infinity,
+                    color: appGreyDarkColor,
+
+                  ),
+                  Container(
+                    // height:  40,
+                    padding: EdgeInsets.only(right: 20),
+                    child:  Column(
+
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Weekly Limit",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: appGreyColor,
+                              fontWeight: FontWeight.normal),
+                        ),
+
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          "₹ 1000.00",
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,color: appWhiteColor),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+
+          ],
+        ),
       ),
     );
+
   }
 
   Widget _appsGrid(List<ApplicationMeta> apps) {

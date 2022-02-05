@@ -1,3 +1,4 @@
+import 'package:finandy/screens/Payment/Bil_Pay.dart';
 import 'package:flutter/material.dart';
 
 import 'expense_bar.dart';
@@ -36,7 +37,11 @@ class _ExpensesCardState extends State<ExpensesCard> {
                     ),
                   ),
                   GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => BilPay()));
+                      },
                       child: Container(
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(

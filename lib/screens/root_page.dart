@@ -134,7 +134,12 @@ class _RootPageState extends State<RootPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => QuickPay()));
+
+                },
                 child: Container(
                   padding: const EdgeInsets.all(5),
                   child: Column(
@@ -233,26 +238,6 @@ class _RootPageState extends State<RootPage> {
                   )
                 ],
               ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 20,right: 20,top: 0),
-            child: ElevatedButton(
-              onPressed: (){
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => BilPay()));
-              },
-              child: Text("Bil Pay"),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 20,right: 20,top: 0),
-            child: ElevatedButton(
-              onPressed: (){
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => QuickPay()));
-              },
-              child: Text("Quick pay"),
             ),
           ),
           Container(

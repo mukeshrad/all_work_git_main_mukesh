@@ -4,6 +4,8 @@ import 'package:finandy/modals/customer.dart';
 import 'package:finandy/screens/app_purpose.dart';
 import 'package:finandy/screens/root_page.dart';
 import 'package:finandy/screens/signin.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/request_permissions.dart';
 
 void main() {
+  firebaseSetup();
   runApp(
     MultiProvider(
       providers: [
@@ -73,7 +76,8 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: isLoggedIn ? const RootPage() : const AppPurpose(),
+      home:  RootPage(),
+      // home: isLoggedIn ? const RootPage() : const AppPurpose(),
       // initialRoute: MyHomePage.id,
       routes: {
         //   '/apps': (context) => const AppsListScreen(),
@@ -94,4 +98,40 @@ class _MyAppState extends State<MyApp> {
       },
     );
   }
+}
+
+
+
+Future firebaseSetup() async {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message)
+  {
+    RemoteNotification? notification = message.notification;
+    if (notification != null) {
+      print('Title ${notification.title}');
+      print('Body ${notification.body}');
+      print('onMessage: ${notification.body.toString()}');
+
+    }});
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+
+    var data = message.toString();
+    print('onMessageOpenedApp: {$data}');
+
+  });
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  await Firebase.initializeApp();
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+
+  print("Handling a background message: ${message.messageId}");
 }

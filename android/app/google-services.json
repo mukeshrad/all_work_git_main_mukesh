@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "947980620617",
+    "project_id": "resilientcreditcard",
+    "storage_bucket": "resilientcreditcard.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947980620617:android:a2016aa60d50aca380c098",
+        "android_client_info": {
+          "package_name": "com.resilientai.finandy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "947980620617-o75pfvsnhva4ajsfkeo107i2ujhl8jkb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUwuu78pQp4oOHjfMudXJEU4vx9khSu2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "947980620617-o75pfvsnhva4ajsfkeo107i2ujhl8jkb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

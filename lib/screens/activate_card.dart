@@ -8,7 +8,7 @@ class ActivateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: mainAppBar(),
+      appBar: mainAppBar(context),
       body: Container(
         margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
         child: Column(

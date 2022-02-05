@@ -9,6 +9,10 @@ import 'package:finandy/utils/nav_drawer.dart';
 import 'package:finandy/utils/rewards_and_offers.dart';
 import 'package:flutter/material.dart';
 
+import 'Payment/Bil_Pay.dart';
+import 'Payment/Quick Pay/QuickPay.dart';
+import 'Quiz Flow/HomePageQuizFlow.dart';
+
 class RootPage extends StatefulWidget {
   static String id = "root";
   const RootPage({Key? key}) : super(key: key);
@@ -112,7 +116,7 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: mainAppBar(),
+      appBar: mainAppBar(context),
       floatingActionButton: FloatingActionButton(
         // elevation: 4.0,
         child: const Icon(Icons.qr_code_scanner_sharp),
@@ -125,47 +129,47 @@ class _RootPageState extends State<RootPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
           child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [const Icon(Icons.money), Text(quickPay)],
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              GestureDetector(
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [const Icon(Icons.money), Text(quickPay)],
+                  ),
+                ),
               ),
-            ),
-          ),
-          // if (centerLocations.contains(fabLocation)) const Spacer(),
-          Container(
-              margin: const EdgeInsets.only(left: 20, bottom: 5),
-              child: Text(
-                scanAndPay,
-                textAlign: TextAlign.center,
-              )),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Screen85()));
-            },
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const Icon(Icons.credit_card_rounded),
-                  Text(cardSettings)
-                ],
+              // if (centerLocations.contains(fabLocation)) const Spacer(),
+              Container(
+                  margin: const EdgeInsets.only(left: 20, bottom: 5),
+                  child: Text(
+                    scanAndPay,
+                    textAlign: TextAlign.center,
+                  )),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Screen85()));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Icon(Icons.credit_card_rounded),
+                      Text(cardSettings)
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
-      )),
+            ],
+          )),
       body: ListView(
         children: [
           const UptrackCard(
@@ -201,35 +205,69 @@ class _RootPageState extends State<RootPage> {
                     children: [
                       Expanded(
                           child: Container(
-                        //  padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              cashback,
-                              maxLines: 3,
-                              style: const TextStyle(fontSize: 14),
+                            //  padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  cashback,
+                                  maxLines: 3,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                ElevatedButton(
+                                  onPressed: bottomModalSheet,
+                                  child: Text(play),
+                                )
+                              ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            ElevatedButton(
-                              onPressed: bottomModalSheet,
-                              child: Text(play),
-                            )
-                          ],
-                        ),
-                      )),
+                          )),
                       Expanded(
                           child: Image.asset(
-                        "assets/images/cashback.gif",
-                      ))
+                            "assets/images/cashback.gif",
+                          ))
                     ],
                   )
                 ],
               ),
             ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 20,right: 20,top: 0),
+            child: ElevatedButton(
+              onPressed: (){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => BilPay()));
+              },
+              child: Text("Bil Pay"),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 20,right: 20,top: 0),
+            child: ElevatedButton(
+              onPressed: (){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => QuickPay()));
+              },
+              child: Text("Quick pay"),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 20,right: 20,top: 0),
+            child: ElevatedButton(
+              onPressed: (){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => QuizHome()));
+              },
+              child: Text("Quiz Home"),
+            ),
+          ),
+
+          SizedBox(
+            height: 30,
           )
         ],
       ),

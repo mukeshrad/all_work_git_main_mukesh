@@ -1,7 +1,8 @@
 import 'package:finandy/constants/texts.dart';
+import 'package:finandy/screens/Payment/Notification/Notification_List.dart';
 import 'package:flutter/material.dart';
 
-AppBar mainAppBar(){
+AppBar mainAppBar(BuildContext context){
     return AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -51,7 +52,13 @@ AppBar mainAppBar(){
               icon: const Icon(Icons.confirmation_num_outlined)
               ),
             IconButton(
-              onPressed: (){},
+              onPressed: (){
+
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => NotificationListPage()));
+
+
+              },
               icon: const Icon(Icons.notifications_none_sharp)
               )  
           ],

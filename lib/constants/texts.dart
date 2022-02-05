@@ -37,3 +37,8 @@
   String nonSalTxt = "Non-Salaried";
   String clientSecret = "257b1e871085b3433674d416fa743668";
   String clientId = "61cb2cb66e46693f8dad6650";
+
+
+  String instant = "Instant cashback";
+  String additional = "Additional cashback";
+  String rcImageUpload = "RC Upload Image";

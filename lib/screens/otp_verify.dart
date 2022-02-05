@@ -57,7 +57,7 @@ class _OTPverifyState extends State<OTPverify> {
           });
           final res1 = await userApi.v1UsersOnBoardUserPost(onboarduserBody);   
           final token = res1!.token.toString();       
-          final userId = res1.user.id; 
+          final userId = res1.user.id.toString();
       // await SmsAutoFill().listenForCode();
       
       // Map<String, dynamic> mp = {
@@ -121,7 +121,7 @@ class _OTPverifyState extends State<OTPverify> {
           });
           final res1 = await userApi.v1UsersOnBoardUserPost(onboarduserBody);   
           final token = res1!.token.toString();       
-          final userId = res1.user.id; 
+          final userId = res1.user.id.toString();
           final String name = res1.user.customerName.toString();
              
             if(name != "null"){

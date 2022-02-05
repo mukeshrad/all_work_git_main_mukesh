@@ -11,170 +11,116 @@ class RCUploadImages extends StatefulWidget {
 }
 
 class _RCUploadImagesState extends State<RCUploadImages> {
-
   var btnSubmitEnable = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
         appBar: AppBar(
-          title:  Text('Upload Image'),
+          title: Text('Upload Image'),
           elevation: 0,
-
         ),
         backgroundColor: appWhiteColor,
         body: Column(
           children: [
-
             Expanded(
-
-              child:  SingleChildScrollView(
-
+              child: SingleChildScrollView(
                 child: Column(
-
                   children: <Widget>[
-
                     fontSideWithoutImageContainer(),
                     backSideWithoutImageContainer()
-
                   ],
                 ),
-
               ),
-
-
             ),
-
             Container(
-
               child: TextButton(
-
                 onPressed: () async {
-
                   //
                   // Navigator.push(context,
                   //     MaterialPageRoute(builder: (context) => ThanksYouCaseBackPage()));
-
-
                 },
                 child: Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15, top: 15),
+                  margin: const EdgeInsets.only(
+                      left: 20, right: 20, bottom: 15, top: 15),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      color: appBlueGColor.withOpacity((btnSubmitEnable == true) ? 1 : 0.5), borderRadius: BorderRadius.circular(10)),
-                  child:  Padding(
-                    padding:
-                    EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                      color: appBlueGColor
+                          .withOpacity((btnSubmitEnable == true) ? 1 : 0.5),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                         child: Text(
-                          'Submit',
-                          style: TextStyle(color: appWhiteColor),
-                        )),
+                      'Submit',
+                      style: TextStyle(color: appWhiteColor),
+                    )),
                   ),
                 ),
               ),
-
             )
-
-
           ],
-        )
-
-
-    );
-
+        ));
   }
 
-  Widget fontSideWithoutImageContainer(){
-
+  Widget fontSideWithoutImageContainer() {
     return Container(
-
       margin: const EdgeInsets.only(left: 30, right: 30, bottom: 0, top: 30),
-
       height: 212,
-
       decoration: BoxDecoration(
-          border: Border.all(color: appBlueGColor,width: 1),
-          borderRadius: BorderRadius.circular(5)
-
-      ),
-
+          border: Border.all(color: appBlueGColor, width: 1),
+          borderRadius: BorderRadius.circular(5)),
       child: TextButton(
-
         style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
             minimumSize: Size(50, 30),
             alignment: Alignment.centerLeft),
         onPressed: () async {
-
-
-
           // Navigator.push(context,
           //     MaterialPageRoute(builder: (context) => ViewRCSelectImage()));
 
-
           // imageSelector(context, "camera");
-
         },
         child: Container(
           width: double.infinity,
           child: Column(
             children: [
-              Expanded(child:
-              Center(
-                child: Image.asset("assets/images/frontSideCam.png",fit: BoxFit.cover,height: 70,width: 70,),
-              )
-
-              ),
-
-
-              Container(
-
-                  width: double.infinity,
-
-                  height: 44,
-
-                  decoration: BoxDecoration(
-
-                      color: appBlueGColor
-
-                  ),
-
+              Expanded(
                   child: Center(
-
-                    child:
-                    Text(
+                child: Image.asset(
+                  "assets/images/frontSideCam.png",
+                  fit: BoxFit.cover,
+                  height: 70,
+                  width: 70,
+                ),
+              )),
+              Container(
+                  width: double.infinity,
+                  height: 44,
+                  decoration: BoxDecoration(color: appBlueGColor),
+                  child: Center(
+                    child: Text(
                       'Front Side',
                       style: TextStyle(
                           fontSize: 18,
                           color: appWhiteColor,
                           fontWeight: FontWeight.w500),
                     ),
-                  )
-              )
+                  ))
             ],
           ),
         ),
       ),
-
     );
   }
-  Widget backSideWithoutImageContainer(){
 
+  Widget backSideWithoutImageContainer() {
     return Container(
-
       margin: const EdgeInsets.only(left: 30, right: 30, bottom: 20, top: 40),
-
       height: 212,
-
       decoration: BoxDecoration(
-          border: Border.all(color: appRedBGColor,width: 1),
-          borderRadius: BorderRadius.circular(5)
-
-      ),
-
+          border: Border.all(color: appRedBGColor, width: 1),
+          borderRadius: BorderRadius.circular(5)),
       child: TextButton(
-
         style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
             minimumSize: Size(50, 30),
@@ -184,42 +130,32 @@ class _RCUploadImagesState extends State<RCUploadImages> {
           width: double.infinity,
           child: Column(
             children: [
-              Expanded(child:
-              Center(
-                child: Image.asset("assets/images/backSideCam.png",fit: BoxFit.cover,height: 70,width: 70,),
-              )
-
-              ),
-
-              Container(
-
-                  width: double.infinity,
-
-                  height: 44,
-
-                  decoration: BoxDecoration(
-
-                      color: appRedBGColor
-
-                  ),
-
+              Expanded(
                   child: Center(
-
-                    child:
-                    Text(
+                child: Image.asset(
+                  "assets/images/backSideCam.png",
+                  fit: BoxFit.cover,
+                  height: 70,
+                  width: 70,
+                ),
+              )),
+              Container(
+                  width: double.infinity,
+                  height: 44,
+                  decoration: BoxDecoration(color: appRedBGColor),
+                  child: Center(
+                    child: Text(
                       'Back Side',
                       style: TextStyle(
                           fontSize: 18,
                           color: appWhiteColor,
                           fontWeight: FontWeight.w500),
                     ),
-                  )
-              )
+                  ))
             ],
           ),
         ),
       ),
-
     );
   }
 
@@ -281,9 +217,9 @@ class _RCUploadImagesState extends State<RCUploadImages> {
                 new ListTile(
                     title: new Text('Gallery'),
                     onTap: () => {
-                      // imageSelector(context, "gallery"),
-                      Navigator.pop(context),
-                    }),
+                          // imageSelector(context, "gallery"),
+                          Navigator.pop(context),
+                        }),
                 new ListTile(
                   title: new Text('Camera'),
                   onTap: () => {
@@ -296,6 +232,4 @@ class _RCUploadImagesState extends State<RCUploadImages> {
           );
         });
   }
-
-
 }

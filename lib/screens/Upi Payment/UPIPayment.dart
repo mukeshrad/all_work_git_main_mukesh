@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'dart:math';
 import 'package:finandy/screens/Upi%20Payment/src/api.dart';
@@ -7,7 +6,6 @@ import 'package:finandy/screens/Upi%20Payment/src/meta.dart';
 import 'package:flutter/material.dart';
 
 class UpiPayment extends StatefulWidget {
-
   const UpiPayment({Key? key}) : super(key: key);
 
   @override
@@ -32,7 +30,8 @@ class _UpiPayment extends State<UpiPayment> {
 
     Future.delayed(Duration(milliseconds: 0), () async {
       _apps = (await UpiPay.getInstalledUpiApplications(
-          statusType: UpiApplicationDiscoveryAppStatusType.all)).cast<ApplicationMeta>();
+              statusType: UpiApplicationDiscoveryAppStatusType.all))
+          .cast<ApplicationMeta>();
       setState(() {});
     });
   }
@@ -81,7 +80,6 @@ class _UpiPayment extends State<UpiPayment> {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -101,7 +99,6 @@ class _UpiPayment extends State<UpiPayment> {
         ),
       ),
     );
-
   }
 
   Widget _vpa() {
@@ -229,7 +226,7 @@ class _UpiPayment extends State<UpiPayment> {
             margin: EdgeInsets.only(bottom: 24),
             child: Text(
               'One of these will be invoked automatically by your phone to '
-                  'make a payment',
+              'make a payment',
               style: Theme.of(context).textTheme.bodyText2,
             ),
           ),
@@ -289,28 +286,28 @@ class _UpiPayment extends State<UpiPayment> {
       children: apps
           .map(
             (it) => Material(
-          key: ObjectKey(it.upiApplication),
-          // color: Colors.grey[200],
-          child: InkWell(
-            onTap: Platform.isAndroid ? () async => await _onTap(it) : null,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                it.iconImage(48),
-                Container(
-                  margin: EdgeInsets.only(top: 4),
-                  alignment: Alignment.center,
-                  child: Text(
-                    it.upiApplication.getAppName(),
-                    textAlign: TextAlign.center,
-                  ),
+              key: ObjectKey(it.upiApplication),
+              // color: Colors.grey[200],
+              child: InkWell(
+                onTap: Platform.isAndroid ? () async => await _onTap(it) : null,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    it.iconImage(48),
+                    Container(
+                      margin: EdgeInsets.only(top: 4),
+                      alignment: Alignment.center,
+                      child: Text(
+                        it.upiApplication.getAppName(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      )
+          )
           .toList(),
     );
   }

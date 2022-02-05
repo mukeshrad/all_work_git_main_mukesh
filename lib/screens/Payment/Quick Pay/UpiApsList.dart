@@ -1,10 +1,9 @@
 import 'dart:math';
-
+import 'package:finandy/constants/Colors.dart';
 import 'package:finandy/screens/Upi%20Payment/src/api.dart';
 import 'package:finandy/screens/Upi%20Payment/src/discovery.dart';
 import 'package:finandy/screens/Upi%20Payment/src/meta.dart';
 import 'package:finandy/screens/Upi%20Payment/src/response.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,7 +13,6 @@ import '../Payment_Received.dart';
 
 import 'package:universal_io/io.dart' as io;
 
-
 class UpiApsList extends StatefulWidget {
   const UpiApsList({Key? key}) : super(key: key);
 
@@ -23,9 +21,7 @@ class UpiApsList extends StatefulWidget {
 }
 
 class _UpiApsListState extends State<UpiApsList> {
-
   List<ApplicationMeta>? _apps; // System Aps upi
-
 
   @override
   void initState() {
@@ -34,41 +30,37 @@ class _UpiApsListState extends State<UpiApsList> {
 
     Future.delayed(Duration(milliseconds: 0), () async {
       _apps = (await UpiPay.getInstalledUpiApplications(
-          statusType: UpiApplicationDiscoveryAppStatusType.all)).cast<ApplicationMeta>();
+              statusType: UpiApplicationDiscoveryAppStatusType.all))
+          .cast<ApplicationMeta>();
       setState(() {});
       print(_apps?.length);
       print("--------- -- -- -- - -- -- - ");
     });
-
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: appWhiteColor,
         appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: const BackButton(color: appBlackColor),
-    title: const Text(
-    "Quick Pay",
-    style: TextStyle(color: appBlackColor),
-    ),
-    ),
-    body: SingleChildScrollView(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: const BackButton(color: appBlackColor),
+          title: const Text(
+            "Quick Pay",
+            style: TextStyle(color: appBlackColor),
+          ),
+        ),
+        body: SingleChildScrollView(
+          child: Container(
+            // height: 100,
+            child: (_apps != null)
+                ? _appsGrid(_apps!.map((e) => e).toList())
+                : Text(""),
 
-      child: Container(
-        // height: 100,
-        child :  (_apps != null) ? _appsGrid(_apps!.map((e) => e).toList()) : Text(""),
-
-        // child: _apps != null ? _nonDiscoverableAppsGrid() : Container(child: Text("dvd"),height: 100,),
-      ),
-
-    )
-    );
+            // child: _apps != null ? _nonDiscoverableAppsGrid() : Container(child: Text("dvd"),height: 100,),
+          ),
+        ));
   }
 
   Future<void> _onTap(ApplicationMeta app) async {
@@ -101,13 +93,10 @@ class _UpiApsListState extends State<UpiApsList> {
 
     print(paymentResponce.toString());
 
-
     if (paymentResponce.status == UpiTransactionStatus.failure) {
-
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PaymentDeclined()));
-
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => PaymentDeclined()));
     } else if (paymentResponce.status == UpiTransactionStatus.success) {
-
       var now = DateTime.now();
       var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
       String getDate = formatter1.format(now);
@@ -121,39 +110,36 @@ class _UpiApsListState extends State<UpiApsList> {
       paymentDetails.amount = "₹ " + price;
       paymentDetails.cardNumber = upi;
       paymentDetails.transID = paymentResponce.txnId.toString();
-      paymentDetails.date =  getDate;
-      paymentDetails.time =  getTime;
+      paymentDetails.date = getDate;
+      paymentDetails.time = getTime;
       paymentDetails.location = "";
 
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PaymentReceived(paymenData: paymentDetails, isFrome: 'BilPay',)));
-
-    }else{
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => PaymentReceived(
+                paymenData: paymentDetails,
+                isFrome: 'BilPay',
+              )));
+    } else {
       if (io.Platform.isAndroid) {
-        _showAlert(context,paymentResponce.rawResponse.toString());
-      }else {
-        _showAlert(context,paymentResponce.toString());
+        _showAlert(context, paymentResponce.rawResponse.toString());
+      } else {
+        _showAlert(context, paymentResponce.toString());
       }
-
-
     }
-
-
   }
 
-  void _showAlert(BuildContext context,String text) {
+  void _showAlert(BuildContext context, String text) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Response"),
-          content: Text(text),
-        )
-    );
+              title: const Text("Response"),
+              content: Text(text),
+            ));
   }
 
   Widget _appsGrid(List<ApplicationMeta> apps) {
-
     return Container(
-      height:  apps.length * 70,
+      height: apps.length * 70,
       child: ListView.builder(
         physics: NeverScrollableScrollPhysics(),
         // Let the ListView know how many items it needs to build.
@@ -162,10 +148,8 @@ class _UpiApsListState extends State<UpiApsList> {
         // Convert each item into a widget based on the type of item it is.
         itemBuilder: (context, index) {
           final item = apps[index];
-          return  Container(
-
+          return Container(
             margin: EdgeInsets.only(top: 10),
-
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -173,10 +157,9 @@ class _UpiApsListState extends State<UpiApsList> {
               ),
               margin: EdgeInsets.symmetric(horizontal: 28),
               child: ListTile(
-                // dense: true,
+                  // dense: true,
 
                   onTap: () async {
-
                     // print(apps[index].upiApplication.androidPackageName);
 
                     // print("Phone tap");
@@ -193,17 +176,14 @@ class _UpiApsListState extends State<UpiApsList> {
                     //     androidPackageName: item.upiApplication.androidPackageName
                     //     // iosUrlScheme: 'pulsesecure://'
                     // );
-
-
                   },
-
                   trailing: Container(
                     decoration: BoxDecoration(
                         color: appGreyColor,
                         borderRadius: BorderRadius.circular(5)),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       child: Text('Pay'),
                     ),
                   ),
@@ -212,23 +192,20 @@ class _UpiApsListState extends State<UpiApsList> {
                     children: [
                       Container(
                         padding: EdgeInsets.only(right: 10),
-
                         width: 20,
                         child: Radio(
                             value: apps[index].upiApplication.getAppName(),
                             groupValue: "",
                             onChanged: (val) {
-
-                              print(apps[index].upiApplication.androidPackageName);
-                            }
-                        ),
+                              print(apps[index]
+                                  .upiApplication
+                                  .androidPackageName);
+                            }),
                       ),
                       apps[index].iconImage(24),
                       Container(
                         padding: EdgeInsets.only(left: 10),
-                        child: Text(
-                            apps[index].upiApplication.getAppName()
-                        ),
+                        child: Text(apps[index].upiApplication.getAppName()),
                       ),
 
                       // SvgPicture.asset(
@@ -248,8 +225,6 @@ class _UpiApsListState extends State<UpiApsList> {
     //
     //
     // },);
-
-
 
     // return GridView.count(
     //   crossAxisCount: 1,

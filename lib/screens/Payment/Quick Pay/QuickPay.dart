@@ -1,15 +1,13 @@
 import 'dart:math';
 import 'dart:core';
 
+import 'package:finandy/constants/Colors.dart';
 import 'package:finandy/screens/Upi%20Payment/src/api.dart';
 import 'package:finandy/screens/Upi%20Payment/src/discovery.dart';
 import 'package:finandy/screens/Upi%20Payment/src/meta.dart';
 import 'package:finandy/screens/Upi%20Payment/src/response.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-
 import '../Bil_Pay.dart';
 import '../Payment_Declined.dart';
 import '../Payment_Received.dart';
@@ -22,9 +20,12 @@ class QuickPay extends StatefulWidget {
 }
 
 class _QuickPayState extends State<QuickPay> {
-
   String val = '';
-  List<TextEditingController> listControlers = [TextEditingController(),TextEditingController(),TextEditingController()];
+  List<TextEditingController> listControlers = [
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController()
+  ];
 
   String mobileNumber = '';
 
@@ -39,7 +40,8 @@ class _QuickPayState extends State<QuickPay> {
   var currentDate = "";
 
   initiateTransaction() async {
-    String upiUrl = 'upi://pay?pa=7220858116@apl&pn=Deepak Kumar&am=10.0&cu=INR';
+    String upiUrl =
+        'upi://pay?pa=7220858116@apl&pn=Deepak Kumar&am=10.0&cu=INR';
   }
 
   @override
@@ -50,7 +52,7 @@ class _QuickPayState extends State<QuickPay> {
     listControlers[0].text = mobileNumber == '' ? "1234567890" : mobileNumber;
     listControlers[1].text = mobileNumber == '' ? "1234567890" : mobileNumber;
     listControlers[2].text = mobileNumber == '' ? "1234567890" : mobileNumber;
-    setState(() { });
+    setState(() {});
 
     setState(() {
       txtEnterAmount.text = "500";
@@ -64,17 +66,14 @@ class _QuickPayState extends State<QuickPay> {
       //
       print("************** hhhhh");
       _apps = (await UpiPay.getInstalledUpiApplications(
-          statusType: UpiApplicationDiscoveryAppStatusType.all)).cast<ApplicationMeta>();
+          statusType: UpiApplicationDiscoveryAppStatusType.all))
+          .cast<ApplicationMeta>();
       print(_apps?.length);
       setState(() {});
     });
   }
 
-
-
-
   Widget build(BuildContext context) {
-
     // background: linear-gradient(177.23deg, #084E6C -13.49%, #084E6C 109.75%);
 
     return Scaffold(
@@ -94,10 +93,10 @@ class _QuickPayState extends State<QuickPay> {
             Container(
               margin: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: appBlueGColor.withOpacity(0.6), //appBlueGColor.withOpacity(0.5),
+                color: appBlueGColor
+                    .withOpacity(0.6), //appBlueGColor.withOpacity(0.5),
                 borderRadius: const BorderRadius.all(Radius.circular(15)),
               ),
-
               child: Container(
                 // height: 170,
                 decoration: BoxDecoration(
@@ -110,18 +109,20 @@ class _QuickPayState extends State<QuickPay> {
                     borderRadius: const BorderRadius.all(Radius.circular(15)),
                     image: DecorationImage(
                         opacity: 0.2,
-                        image: Image.asset("asset/Paymenticon/bgCard.jpeg", height: 20,width: 20,).image,
-                        fit: BoxFit.cover
-                    )
-                ),
+                        image: Image.asset(
+                          "asset/Paymenticon/bgCard.jpeg",
+                          height: 20,
+                          width: 20,
+                        ).image,
+                        fit: BoxFit.cover)),
                 child: Column(
-                  children:[
+                  children: [
                     Container(
                       // height:  40,
-                      padding: EdgeInsets.only(left: 20,right: 20,top: 15,bottom: 5),
+                      padding: EdgeInsets.only(
+                          left: 20, right: 20, top: 15, bottom: 5),
 
-                      child:  Row(
-
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -129,41 +130,36 @@ class _QuickPayState extends State<QuickPay> {
                             "My E-Card",
                             style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,color: appWhiteColor),
+                                fontWeight: FontWeight.bold,
+                                color: appWhiteColor),
                           ),
                           SizedBox(
                             height: 8,
                           ),
 
-
                           Row(
                             children: [
-
                               Text(
                                 "UPTR",
                                 style: TextStyle(
                                     fontSize: 17,
-                                    fontWeight: FontWeight.bold,color: appWhiteColor),
+                                    fontWeight: FontWeight.bold,
+                                    color: appWhiteColor),
                               ),
-
-
-
-                              Image.asset("assets/images/uptrackLogo.png",fit: BoxFit.cover,height: 15,),
-
-
+                              Image.asset(
+                                "assets/images/uptrackLogo.png",
+                                fit: BoxFit.cover,
+                                height: 15,
+                              ),
                               Text(
                                 "CK",
                                 style: TextStyle(
                                     fontSize: 17,
-                                    fontWeight: FontWeight.bold,color: appWhiteColor),
+                                    fontWeight: FontWeight.bold,
+                                    color: appWhiteColor),
                               ),
-
-
-
-
                             ],
                           ),
-
 
                           // Text(
                           //   "UPTR CK",
@@ -172,17 +168,13 @@ class _QuickPayState extends State<QuickPay> {
                           //       fontWeight: FontWeight.bold,color: appWhiteColor),
                           // ),
                         ],
-
-
                       ),
-
-
                     ),
                     Container(
                       // height:  40,
-                      padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 5),
-                      child:  Column(
-
+                      padding: EdgeInsets.only(
+                          left: 20, right: 20, top: 10, bottom: 5),
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: const [
@@ -200,27 +192,21 @@ class _QuickPayState extends State<QuickPay> {
                             "7987 8453 98",
                             style: TextStyle(
                                 fontSize: 17,
-                                fontWeight: FontWeight.bold,color: appWhiteColor),
+                                fontWeight: FontWeight.bold,
+                                color: appWhiteColor),
                           ),
                         ],
-
-
                       ),
-
-
                     ),
                     Container(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
-
                         children: [
-
                           Container(
                             // height:  40,
                             padding: EdgeInsets.only(left: 20),
-                            child:  Column(
-
+                            child: Column(
                               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               // crossAxisAlignment: CrossAxisAlignment.center,
                               children: const [
@@ -229,7 +215,8 @@ class _QuickPayState extends State<QuickPay> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: appGreyColor,
-                                    fontWeight: FontWeight.normal,),
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                 ),
                                 SizedBox(
                                   height: 8,
@@ -238,27 +225,23 @@ class _QuickPayState extends State<QuickPay> {
                                   "₹ 4000.00",
                                   style: TextStyle(
                                       fontSize: 17,
-                                      fontWeight: FontWeight.bold,color: appWhiteColor),
+                                      fontWeight: FontWeight.bold,
+                                      color: appWhiteColor),
                                 ),
                               ],
-
-
                             ),
-
-
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: 10,bottom: 10),
+                            margin: EdgeInsets.only(top: 10, bottom: 10),
                             width: 0.1,
                             height: 50,
                             // height: double.infinity,
                             color: appGreyDarkColor,
-
                           ),
                           Container(
                             // height:  40,
                             padding: EdgeInsets.only(right: 20),
-                            child:  Column(
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: const [
@@ -269,7 +252,6 @@ class _QuickPayState extends State<QuickPay> {
                                       color: appGreyColor,
                                       fontWeight: FontWeight.normal),
                                 ),
-
                                 SizedBox(
                                   height: 8,
                                 ),
@@ -277,7 +259,8 @@ class _QuickPayState extends State<QuickPay> {
                                   "₹ 1000.00",
                                   style: TextStyle(
                                       fontSize: 17,
-                                      fontWeight: FontWeight.bold,color: appWhiteColor),
+                                      fontWeight: FontWeight.bold,
+                                      color: appWhiteColor),
                                 ),
                               ],
                             ),
@@ -285,7 +268,6 @@ class _QuickPayState extends State<QuickPay> {
                         ],
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -293,36 +275,33 @@ class _QuickPayState extends State<QuickPay> {
             Container(
               // height: 170,
               decoration: BoxDecoration(
-                  border: Border.all(color: appGreyColor, width: 0.2),
-                  borderRadius: const BorderRadius.all(Radius.circular(15)),
+                border: Border.all(color: appGreyColor, width: 0.2),
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
 
-            //       boxShadow: [
-            //   BoxShadow(
-            //   color: appGreyColor,
-            //   spreadRadius: 5,
-            //   blurRadius: 9,
-            //   offset: Offset(0, 2), // changes position of shadow
-            // ),
-          // ],
-
+                //       boxShadow: [
+                //   BoxShadow(
+                //   color: appGreyColor,
+                //   spreadRadius: 5,
+                //   blurRadius: 9,
+                //   offset: Offset(0, 2), // changes position of shadow
+                // ),
+                // ],
               ),
               margin: EdgeInsets.all(20),
-              child:  Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
                     padding: EdgeInsets.only(top: 10),
-
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-
                         Container(
                           // height:  40,
                           padding: EdgeInsets.only(left: 20),
-                          child:  Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
                               Text(
@@ -338,29 +317,22 @@ class _QuickPayState extends State<QuickPay> {
                               Text(
                                 "₹ 500",
                                 style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold),
+                                    fontSize: 24, fontWeight: FontWeight.bold),
                               ),
                             ],
-
-
                           ),
-
-
                         ),
                         Container(
-                          margin: EdgeInsets.only(top: 10,bottom: 10),
+                          margin: EdgeInsets.only(top: 10, bottom: 10),
                           width: 0.1,
                           height: 50,
                           // height: double.infinity,
                           color: appGreyDarkColor,
-
                         ),
                         Container(
                           // height:  40,
                           padding: EdgeInsets.only(right: 20),
-                          child:  Column(
-
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: const [
@@ -371,15 +343,13 @@ class _QuickPayState extends State<QuickPay> {
                                     color: appGreyDarkColor,
                                     fontWeight: FontWeight.normal),
                               ),
-
                               SizedBox(
                                 height: 8,
                               ),
                               Text(
                                 "₹ 1000.00",
                                 style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold),
+                                    fontSize: 24, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -392,35 +362,42 @@ class _QuickPayState extends State<QuickPay> {
                     padding: EdgeInsets.only(left: 10),
                     decoration: BoxDecoration(
                         border: Border.all(color: appGreyColor, width: 0.2),
-                        borderRadius: const BorderRadius.all(Radius.circular(7))),
+                        borderRadius:
+                        const BorderRadius.all(Radius.circular(7))),
                     margin: EdgeInsets.all(20),
-
                     child: Row(
-
                       children: [
-
                         // Icon(Icons.calendar_today_sharp,),
-                        SizedBox(width: 10,),
+                        SizedBox(
+                          width: 10,
+                        ),
 
-                        Image.asset("assets/images/calendarLogo.png",fit: BoxFit.cover,height: 20,),
+                        Image.asset(
+                          "assets/images/calendarLogo.png",
+                          fit: BoxFit.cover,
+                          height: 20,
+                        ),
 
-                        SizedBox(width: 10,),
+                        SizedBox(
+                          width: 10,
+                        ),
 
-                        TextButton(onPressed: (){
-
-                        }, child: Text(
-                          currentDate,
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: appBlackColor,
-                              fontWeight: FontWeight.w800),
-                        ),)
+                        TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            currentDate,
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: appBlackColor,
+                                fontWeight: FontWeight.w800),
+                          ),
+                        )
                       ],
                     ),
-
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 25, vertical: 10),
                     child: TextFormField(
                       showCursor: false,
                       readOnly: false,
@@ -433,29 +410,28 @@ class _QuickPayState extends State<QuickPay> {
                           isDense: true,
                           hintText: "₹ 500",
                           labelText: 'Enter Amount',
-                          suffixIcon: IconButton(onPressed: (){
-                            print("Work");
-                            // Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectContacts()));
-
-                          }, icon: Container(), ),//,
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              print("Work");
+                              // Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectContacts()));
+                            },
+                            icon: Container(),
+                          ), //,
                           fillColor: Colors.grey.shade200),
                     ),
                   ),
                   Container(
                     // height: 42,
-                    padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
-                    child:
-                    Text(
+                    padding: EdgeInsets.only(
+                        left: 20, right: 20, top: 10, bottom: 10),
+                    child: Text(
                       "*If you are paying full outstanding balance you will save rs10.",
                       style: TextStyle(
                           fontSize: 16,
                           color: appBlackColor,
-
                           fontWeight: FontWeight.normal),
                     ),
-
                   ),
-
                   Container(
                     height: 5,
                     color: appGreyColor.withOpacity(0.5),
@@ -471,26 +447,23 @@ class _QuickPayState extends State<QuickPay> {
                     height: 20,
                     // color: Colors.black,
                   ),
-
                 ],
               ),
             ),
-
             Container(
               child: TextButton(
                 onPressed: () {
-
                   buttonSheetPage(_apps);
-
                 },
                 child: Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20, bottom: 30, top: 40),
+                  margin: const EdgeInsets.only(
+                      left: 20, right: 20, bottom: 30, top: 40),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      color: appRedBGColor, borderRadius: BorderRadius.circular(10)),
+                      color: appRedBGColor,
+                      borderRadius: BorderRadius.circular(10)),
                   child: const Padding(
-                    padding:
-                    EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                       // PaymentDeclined
                         child: Text(
@@ -517,10 +490,7 @@ class _QuickPayState extends State<QuickPay> {
     return null;
   }
 
-
-
   Future<void> _onTap(ApplicationMeta app) async {
-
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
     print("Starting transaction with id $transactionRef");
 
@@ -539,13 +509,10 @@ class _QuickPayState extends State<QuickPay> {
 
     print(paymentResponce.toString());
 
-
     if (paymentResponce.status == UpiTransactionStatus.failure) {
-
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PaymentDeclined()));
-
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => PaymentDeclined()));
     } else if (paymentResponce.status == UpiTransactionStatus.success) {
-
       var now = DateTime.now();
       var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
       String getDate = formatter1.format(now);
@@ -559,193 +526,185 @@ class _QuickPayState extends State<QuickPay> {
       paymentDetails.amount = "₹ " + price;
       paymentDetails.cardNumber = upi;
       paymentDetails.transID = paymentResponce.txnId.toString();
-      paymentDetails.date =  getDate;
-      paymentDetails.time =  getTime;
+      paymentDetails.date = getDate;
+      paymentDetails.time = getTime;
       paymentDetails.location = "";
 
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PaymentReceived(paymenData: paymentDetails, isFrome: '',)));
-
-    }else{
-    }
-
-
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => PaymentReceived(
+            paymenData: paymentDetails,
+            isFrome: '',
+          )));
+    } else {}
   }
 
-  void _showAlert(BuildContext context,String text) {
+  void _showAlert(BuildContext context, String text) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("Response"),
           content: Text(text),
-        )
-    );
+        ));
   }
 
   // Show buttom Sheet
-  void buttonSheetPage (List<ApplicationMeta>? _apps){
-
+  void buttonSheetPage(List<ApplicationMeta>? _apps) {
     showModalBottomSheet<dynamic>(
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(15))),
         context: context,
         builder: (context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, setState) {
-                return Container(
-                  height: ((_apps?.length ?? 0 + 3) * 70),
-                  decoration: BoxDecoration(
-                      color: appWhite1Color,
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(25),
-                        topLeft: Radius.circular(25),
-                      )
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
+          return StatefulBuilder(builder: (BuildContext context, setState) {
+            return Container(
+              height: ((_apps?.length ?? 0 + 3) * 70),
+              decoration: BoxDecoration(
+                  color: appWhite1Color,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(25),
+                    topLeft: Radius.circular(25),
+                  )),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(bottom: 10),
 
-                      children: [
+                      // height: 50,
+                      // color: Colors.red,
 
-                        Container(
-                          margin: EdgeInsets.only(bottom: 10),
-
-                          // height: 50,
-                          // color: Colors.red,
-
-                          child: Column(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: appWhiteColor,
-                                    borderRadius: BorderRadius.all(Radius.circular(15))
-                                ),
-                                child: InkWell(
-                                  onTap: (){
-                                    print("fdsvdf");
-                                    Navigator.pop(context);
-
-                                  },
-
-                                  child: Image.asset("asset/Paymenticon/DownEro.png", height: 30,width: 30,),
-
-
-                                ),
-                                margin: EdgeInsets.only(top: 10,bottom: 10),
-
-                              ),
-                              const Text(
-                                'Recommended Options',
-                                style: TextStyle(color: appBlackColor),
-                              ),
-                            ],
-                          ),
-
-
-                        ),
-
-                        Container(
-                          height:  _apps!.length * 70,
-                          child: ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            // Let the ListView know how many items it needs to build.
-                            itemCount: _apps.length,
-                            // Provide a builder function. This is where the magic happens.
-                            // Convert each item into a widget based on the type of item it is.
-                            itemBuilder: (context, index) {
-                              final item = _apps[index];
-                              return  Container(
-
-                                margin: EdgeInsets.only(top: 10),
-
-                                child: Card(
-                                  elevation: 4,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  margin: EdgeInsets.symmetric(horizontal: 28),
-                                  child: ListTile(
-                                      onTap: () async {
-                                        setState(() {
-                                          selectIndex = index;
-                                        });
-                                      },
-                                      trailing: InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            selectIndex = index;
-                                            print("selectIndex : $selectIndex");
-                                            setState(() {
-
-                                            });
-                                          });
-                                        },
-                                        child: Container(
-                                          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: selectIndex == index ? Image.asset("asset/Paymenticon/check1.png", height: 20,width: 20,) : Image.asset("asset/Paymenticon/uncheck1.png", height: 20,width: 20,),
-                                          ),
-                                        ),
-
-                                      ),
-                                      leading: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.only(right: 10),
-                                            width: 20,
-                                          ),
-                                          _apps[index].iconImage(24),
-                                          Container(
-                                            padding: EdgeInsets.only(left: 10),
-                                            child: Text(
-                                                _apps[index].upiApplication.getAppName()
-                                            ),
-                                          ),
-                                        ],
-                                      )),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
-                        // (_apps != null) ? _appsGrid(_apps!.map((e) => e).toList()) : Text(""),
-
-                        TextButton(
-                          onPressed: () async {
-                            await _onTap(_apps[selectIndex]);
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(left: 20, right: 20, bottom: 0, top: 0),
-                            width: double.infinity,
+                      child: Column(
+                        children: [
+                          Container(
                             decoration: BoxDecoration(
-                                color: appRedBGColor, borderRadius: BorderRadius.circular(10)),
-                            child: const Padding(
-                              padding:
-                              EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                              child: Center(
-                                // PaymentDeclined
-                                  child: Text(
-                                    'Proceed to Pay',
-                                    style: TextStyle(color: appWhiteColor),
+                                color: appWhiteColor,
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                            child: InkWell(
+                              onTap: () {
+                                print("fdsvdf");
+                                Navigator.pop(context);
+                              },
+                              child: Image.asset(
+                                "asset/Paymenticon/DownEro.png",
+                                height: 30,
+                                width: 30,
+                              ),
+                            ),
+                            margin: EdgeInsets.only(top: 10, bottom: 10),
+                          ),
+                          const Text(
+                            'Recommended Options',
+                            style: TextStyle(color: appBlackColor),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Container(
+                      height: _apps!.length * 70,
+                      child: ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        // Let the ListView know how many items it needs to build.
+                        itemCount: _apps.length,
+                        // Provide a builder function. This is where the magic happens.
+                        // Convert each item into a widget based on the type of item it is.
+                        itemBuilder: (context, index) {
+                          final item = _apps[index];
+                          return Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: Card(
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              margin: EdgeInsets.symmetric(horizontal: 28),
+                              child: ListTile(
+                                  onTap: () async {
+                                    setState(() {
+                                      selectIndex = index;
+                                    });
+                                  },
+                                  trailing: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        selectIndex = index;
+                                        print("selectIndex : $selectIndex");
+                                        setState(() {});
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: selectIndex == index
+                                            ? Image.asset(
+                                          "asset/Paymenticon/check1.png",
+                                          height: 20,
+                                          width: 20,
+                                        )
+                                            : Image.asset(
+                                          "asset/Paymenticon/uncheck1.png",
+                                          height: 20,
+                                          width: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  leading: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(right: 10),
+                                        width: 20,
+                                      ),
+                                      _apps[index].iconImage(24),
+                                      Container(
+                                        padding: EdgeInsets.only(left: 10),
+                                        child: Text(_apps[index]
+                                            .upiApplication
+                                            .getAppName()),
+                                      ),
+                                    ],
                                   )),
                             ),
-                          ),
-                        ),
-
-
-                      ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                );
 
+                    // (_apps != null) ? _appsGrid(_apps!.map((e) => e).toList()) : Text(""),
 
-              }
-          );
+                    TextButton(
+                      onPressed: () async {
+                        await _onTap(_apps[selectIndex]);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                            left: 20, right: 20, bottom: 0, top: 0),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: appRedBGColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 15),
+                          child: Center(
+                            // PaymentDeclined
+                              child: Text(
+                                'Proceed to Pay',
+                                style: TextStyle(color: appWhiteColor),
+                              )),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
         });
-
   }
-
-
 }

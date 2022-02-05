@@ -17,79 +17,60 @@ class _ViewRCSelectImageState extends State<ViewRCSelectImage> {
         backgroundColor: appWhiteColor,
         body: Column(
           children: [
-
-            Expanded(child: Container(
-
+            Expanded(
+              child: Container(),
             ),
-
-            ),
-
             Container(
-
               child: TextButton(
-
                 onPressed: () async {
-
                   // Navigator.push(context,
                   //     MaterialPageRoute(builder: (context) => ThanksYouCaseBackPage()));
-
                 },
                 child: Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15, top: 15),
+                  margin: const EdgeInsets.only(
+                      left: 20, right: 20, bottom: 15, top: 15),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      color: appBlueGColor, borderRadius: BorderRadius.circular(10)),
-                  child:  Padding(
-                    padding:
-                    EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                      color: appBlueGColor,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                         child: Text(
-                          'Submit',
-                          style: TextStyle(color: appWhiteColor),
-                        )),
+                      'Submit',
+                      style: TextStyle(color: appWhiteColor),
+                    )),
                   ),
                 ),
               ),
-
             ),
             Container(
-
               child: TextButton(
-
                 onPressed: () async {
-
                   //
                   // Navigator.push(context,
                   //     MaterialPageRoute(builder: (context) => ThanksYouCaseBackPage()));
-
-
                 },
                 child: Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15, top: 15),
+                  margin: const EdgeInsets.only(
+                      left: 20, right: 20, bottom: 15, top: 15),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      color: appBlueGColor, borderRadius: BorderRadius.circular(10)),
-                  child:  Padding(
-                    padding:
-                    EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                      color: appBlueGColor,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                         child: Text(
-                          'Submit',
-                          style: TextStyle(color: appWhiteColor),
-                        )),
+                      'Submit',
+                      style: TextStyle(color: appWhiteColor),
+                    )),
                   ),
                 ),
               ),
-
             )
-
-
           ],
-        )
-
-
-    );
-
+        ));
   }
 
   //********************** IMAGE PICKER
@@ -97,14 +78,15 @@ class _ViewRCSelectImageState extends State<ViewRCSelectImage> {
     switch (pickerType) {
       case "gallery":
 
-      /// GALLERY IMAGE PICKER
-      //   imageFile = await ImagePicker.pickImage(
-      //       source: ImageSource.gallery, imageQuality: 90);
-      //   break;
+        /// GALLERY IMAGE PICKER
+        //   imageFile = await ImagePicker.pickImage(
+        //       source: ImageSource.gallery, imageQuality: 90);
+        //   break;
         final ImagePicker _picker = ImagePicker();
 
         try {
-          final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+          final pickedFile =
+              await _picker.pickImage(source: ImageSource.gallery);
           setState(() {
             print(pickedFile?.name.toString());
             // _imageFile = pickedFile;
@@ -117,13 +99,14 @@ class _ViewRCSelectImageState extends State<ViewRCSelectImage> {
         break;
 
       case "camera": // CAMERA CAPTURE CODE
-      // imageFile = await ImagePicker.pickImage(
-      //     source: ImageSource.camera, imageQuality: 90);
+        // imageFile = await ImagePicker.pickImage(
+        //     source: ImageSource.camera, imageQuality: 90);
 
         final ImagePicker _picker = ImagePicker();
 
         try {
-          final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+          final pickedFile =
+              await _picker.pickImage(source: ImageSource.camera);
           setState(() {
             print(pickedFile?.name.toString());
             // _imageFile = pickedFile;
@@ -136,9 +119,5 @@ class _ViewRCSelectImageState extends State<ViewRCSelectImage> {
 
         break;
     }
-
   }
-
-
-
 }

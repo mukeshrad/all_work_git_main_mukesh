@@ -16,13 +16,14 @@ class _NotificationList extends State<NotificationListPage> {
   void initState() {
     super.initState();
 
-    //:- Set Dummy Data For Notification List
+    //:- Add TODO for actual API integration.
     var item1 = NotificatioListModal();
     item1.date = "10:30 AM";
     item1.title = "Your Password have been successfully changed.";
     item1.isNew = true;
     notificationList.add(item1);
 
+    //:- Add TODO for actual API integration.
     for (var i = 0; i < 6; i++) {
       var item1 = NotificatioListModal();
       item1.date = "10:30 AM";
@@ -30,12 +31,6 @@ class _NotificationList extends State<NotificationListPage> {
       item1.isNew = false;
       notificationList.add(item1);
     }
-    //
-
-    // FirebaseMessaging.instance
-    //     .getToken()
-    //     .then((value) => print('Device Token FCM : ${value.toString()}'));
-
     setState(() {});
   }
 
@@ -74,7 +69,6 @@ class _NotificationList extends State<NotificationListPage> {
                       child: Center(
                         child: TextButton(
                           onPressed: () {
-                            print("Press Button");
                           },
                           child: const Text("View All Notifications",
                               overflow: TextOverflow.ellipsis,

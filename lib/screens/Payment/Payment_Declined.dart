@@ -45,7 +45,7 @@ class _PaymentDeclinedState extends State<PaymentDeclined> {
                         "Your Transaction failed due to some technical issues, in case the Amount gets deducted , you will get a refund within 24 Hrs.",
                         textAlign: TextAlign.center,
                         style:
-                            const TextStyle(color: Colors.black, fontSize: 17)),
+                        const TextStyle(color: Colors.black, fontSize: 17)),
                   )
                 ],
               ),
@@ -68,15 +68,13 @@ class _PaymentDeclinedState extends State<PaymentDeclined> {
                 child: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                   child: Center(
-
-                      // PaymentDeclined
                       child: Text(
-                    "try again",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.normal),
-                  )),
+                        "Try Again",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.normal),
+                      )),
                 ),
               ),
             ),

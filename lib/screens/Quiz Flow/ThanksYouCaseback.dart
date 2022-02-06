@@ -22,7 +22,7 @@ class _ThanksYouCaseBackPageState extends State<ThanksYouCaseBackPage> {
                 margin: EdgeInsets.only(top: 80),
                 height: 84,
                 decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(32)),
+                BoxDecoration(borderRadius: BorderRadius.circular(32)),
                 child: Image.asset(
                   "assets/images/verifyed.png",
                   width: 64,
@@ -122,12 +122,12 @@ class _ThanksYouCaseBackPageState extends State<ThanksYouCaseBackPage> {
                         borderRadius: BorderRadius.circular(10)),
                     child: const Padding(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                       child: Center(
                           child: Text(
-                        'Home',
-                        style: TextStyle(color: appWhiteColor),
-                      )),
+                            'Home',
+                            style: TextStyle(color: appWhiteColor),
+                          )),
                     ),
                   ),
                 ),

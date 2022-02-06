@@ -40,7 +40,7 @@ class _ExpensesCardState extends State<ExpensesCard> {
                       onTap: () {
 
                         Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => BilPay()));
+                            MaterialPageRoute(builder: (context) => PayInformation(isScreen: "bilPay",)));
                       },
                       child: Container(
                           padding: const EdgeInsets.all(5),

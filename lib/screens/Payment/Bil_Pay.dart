@@ -8,23 +8,24 @@ import 'package:finandy/screens/Upi%20Payment/src/meta.dart';
 import 'package:finandy/screens/Upi%20Payment/src/response.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:mobile_number/mobile_number.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'Payment_Declined.dart';
 import 'Payment_Received.dart';
 
-class BilPay extends StatefulWidget {
-  static String id = "Billpay";
-  const BilPay({Key? key}) : super(key: key);
+class PayInformation extends StatefulWidget {
+  final isScreen;
+  const PayInformation({Key? key,required this.isScreen}) : super(key: key);
+
 
   @override
-  _BilPayState createState() => _BilPayState();
+  _PayInformationState createState() => _PayInformationState();
 }
 
-class _BilPayState extends State<BilPay> {
+class _PayInformationState extends State<PayInformation> {
+
+  var payInfoTypeScreen = "bilPay";
   String val = '';
   // String _mobileNumber = '';
   // List<SimCard> _simCard = <SimCard>[];
@@ -42,14 +43,18 @@ class _BilPayState extends State<BilPay> {
         'upi://pay?pa=7220858116@apl&pn=Deepak Kumar&am=10.0&cu=INR';
     await launch(upiUrl).then((value) {
       if (kDebugMode) {
-        print(value);
+        // print(value);
       }
-    }).catchError((err) => print(err));
+    }).catchError((err) =>
+        print(err)
+    );
   }
 
   Future<void> _onTap(ApplicationMeta app) async {
+
+    //:- Add TODO for actual integration.
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
-    print("Starting transaction with id $transactionRef");
+    // print("Starting transaction with id $transactionRef");
 
     String price = "10.0";
     String upi = "7220858116@apl";
@@ -64,7 +69,7 @@ class _BilPayState extends State<BilPay> {
       // merchantCode: '7372',
     );
 
-    print(paymentResponce.toString());
+    // print(paymentResponce.toString());
 
     if (paymentResponce.status == UpiTransactionStatus.failure) {
       Navigator.of(context)
@@ -73,11 +78,9 @@ class _BilPayState extends State<BilPay> {
       var now = DateTime.now();
       var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
       String getDate = formatter1.format(now);
-      print(getDate);
 
       var formatter2 = new DateFormat('hh:mm a'); //yyyy-MM-dd
       String getTime = formatter2.format(now);
-      print(getTime);
 
       var paymentDetails = UpiPaymentResponse();
       paymentDetails.amount = "₹ " + price;
@@ -89,9 +92,9 @@ class _BilPayState extends State<BilPay> {
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => PaymentReceived(
-                paymenData: paymentDetails,
-                isFrome: 'BilPay',
-              )));
+            paymenData: paymentDetails,
+            isFrome: 'BilPay',
+          )));
     } else {
       if (io.Platform.isAndroid) {
         _showAlert(context, paymentResponce.rawResponse.toString());
@@ -105,9 +108,9 @@ class _BilPayState extends State<BilPay> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: const Text("Response"),
-              content: Text(text),
-            ));
+          title: const Text("Response"),
+          content: Text(text),
+        ));
   }
 
   @override
@@ -122,7 +125,12 @@ class _BilPayState extends State<BilPay> {
     //
     // initMobileNumberState();
 
+    payInfoTypeScreen = widget.isScreen;
+
+    print("widget.isScreen : $payInfoTypeScreen");
+
     setState(() {
+
       txtEnterAmount.text = "500";
       var now = DateTime.now();
       var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
@@ -132,7 +140,7 @@ class _BilPayState extends State<BilPay> {
 
     Future.delayed(Duration(milliseconds: 0), () async {
       _apps = (await UpiPay.getInstalledUpiApplications(
-              statusType: UpiApplicationDiscoveryAppStatusType.all))
+          statusType: UpiApplicationDiscoveryAppStatusType.all))
           .cast<ApplicationMeta>();
       setState(() {});
     });
@@ -170,8 +178,9 @@ class _BilPayState extends State<BilPay> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const BackButton(color: appBlackColor),
-        title: const Text(
-          "Bil Pay",
+        title: Text(
+          (payInfoTypeScreen == "bilPay") ?
+          "Bil Pay" : "Quick Pay",
           style: TextStyle(color: appBlackColor),
         ),
       ),
@@ -179,162 +188,8 @@ class _BilPayState extends State<BilPay> {
         child: Column(
           children: [
             cardUser(),
-            Container(
-              // height: 170,
-              decoration: BoxDecoration(
-                border: Border.all(color: appGreyColor, width: 0.2),
-                borderRadius: const BorderRadius.all(Radius.circular(15)),
-              ),
-              margin: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          // height:  40,
-
-                          padding: EdgeInsets.only(left: 20),
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                "Payment Due",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: appGreyDarkColor,
-                                    fontWeight: FontWeight.normal),
-                              ),
-                              SizedBox(
-                                height: 8,
-                              ),
-                              Text(
-                                "₹ 500",
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(top: 10, bottom: 10),
-                          width: 0.1,
-                          height: 50,
-                          // height: double.infinity,
-                          color: appGreyDarkColor,
-                        ),
-                        Container(
-                          // height:  40,
-                          padding: EdgeInsets.only(right: 20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            // crossAxisAlignment: CrossAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                            children: [
-                              Text(
-                                "Due Date",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: appGreyDarkColor,
-                                    fontWeight: FontWeight.normal),
-                              ),
-                              SizedBox(
-                                height: 8,
-                              ),
-                              Text(
-                                currentDate,
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 25, vertical: 10),
-                    child: TextFormField(
-                      showCursor: false,
-                      readOnly: false,
-                      controller: txtEnterAmount,
-                      keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          filled: true,
-                          isDense: true,
-                          hintText: "₹ 500",
-                          labelText: 'Enter Amount',
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              print("Work");
-                              // Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectContacts()));
-                            },
-                            icon: Container(),
-                          ), //,
-                          fillColor: Colors.grey.shade200),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    height: 5,
-                    color: appGreyColor.withOpacity(0.5),
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(
-                        // border: Border.all(color: Colors.grey,width: 1),
-                        color: appBlueGColor,
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(15),
-                            bottomRight: Radius.circular(15))),
-
-                    height: 20,
-                    // color: Colors.black,
-                  ),
-                ],
-              ),
-            ),
-
-            // Expanded(
-            //   child: Container(),
-            // ),
-            // Expanded(child: Container()),
-            Container(
-              child: TextButton(
-                onPressed: () {
-                  buttonSheetPage(_apps);
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(
-                      left: 20, right: 20, bottom: 30, top: 40),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: appRedBGColor,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                    child: Center(
-                        // PaymentDeclined
-                        child: Text(
-                      'Proceed to Pay',
-                      style: TextStyle(color: appWhiteColor),
-                    )),
-                  ),
-                ),
-              ),
-            ),
+            paymentInfo(),
+            payButton()
           ],
         ),
       ),
@@ -522,6 +377,348 @@ class _BilPayState extends State<BilPay> {
       ),
     );
   }
+  Widget paymentInfo(){
+    if (payInfoTypeScreen == "bilPay"){
+      return Container(
+        // height: 170,
+        decoration: BoxDecoration(
+          border: Border.all(color: appGreyColor, width: 0.2),
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
+        ),
+        margin: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: EdgeInsets.only(top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    // height:  40,
+
+                    padding: EdgeInsets.only(left: 20),
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          "Payment Due",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: appGreyDarkColor,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          "₹ 500",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                    width: 0.1,
+                    height: 50,
+                    // height: double.infinity,
+                    color: appGreyDarkColor,
+                  ),
+                  Container(
+                    // height:  40,
+                    padding: EdgeInsets.only(right: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Text(
+                          "Due Date",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: appGreyDarkColor,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          currentDate,
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 25, vertical: 10),
+              child: TextFormField(
+                enabled: false,
+                showCursor: false,
+                readOnly: true,
+                controller: txtEnterAmount,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                    ),
+                    filled: true,
+                    isDense: true,
+                    hintText: "₹ 500",
+                    labelText: 'Enter Amount',
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        // Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectContacts()));
+                      },
+                      icon: Container(),
+                    ), //,
+                    fillColor: Colors.grey.shade200
+
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Container(
+              height: 5,
+              color: appGreyColor.withOpacity(0.5),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                // border: Border.all(color: Colors.grey,width: 1),
+                  color: appBlueGColor,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(15),
+                      bottomRight: Radius.circular(15))),
+
+              height: 20,
+              // color: Colors.black,
+            ),
+          ],
+        ),
+      );
+    }else{
+      return Container(
+        // height: 170,
+        decoration: BoxDecoration(
+          border: Border.all(color: appGreyColor, width: 0.2),
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
+
+          //       boxShadow: [
+          //   BoxShadow(
+          //   color: appGreyColor,
+          //   spreadRadius: 5,
+          //   blurRadius: 9,
+          //   offset: Offset(0, 2), // changes position of shadow
+          // ),
+          // ],
+        ),
+        margin: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: EdgeInsets.only(top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    // height:  40,
+                    padding: EdgeInsets.only(left: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          "Payment Due",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: appGreyDarkColor,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          "₹ 500",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                    width: 0.1,
+                    height: 50,
+                    // height: double.infinity,
+                    color: appGreyDarkColor,
+                  ),
+                  Container(
+                    // height:  40,
+                    padding: EdgeInsets.only(right: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Unbilled Amount",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: appGreyDarkColor,
+                              fontWeight: FontWeight.normal),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          "₹ 1000.00",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              height: 50,
+              padding: EdgeInsets.only(left: 10),
+              decoration: BoxDecoration(
+                  border: Border.all(color: appGreyColor, width: 0.2),
+                  borderRadius:
+                  const BorderRadius.all(Radius.circular(7))),
+              margin: EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  // Icon(Icons.calendar_today_sharp,),
+                  SizedBox(
+                    width: 10,
+                  ),
+
+                  Image.asset(
+                    "assets/images/calendarLogo.png",
+                    fit: BoxFit.cover,
+                    height: 20,
+                  ),
+
+                  SizedBox(
+                    width: 10,
+                  ),
+
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      currentDate,
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: appBlackColor,
+                          fontWeight: FontWeight.w800),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 25, vertical: 10),
+              child: TextFormField(
+                showCursor: false,
+                readOnly: false,
+                controller: txtEnterAmount,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                    filled: true,
+                    isDense: true,
+                    hintText: "₹ 500",
+                    labelText: 'Enter Amount',
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        ("Work");
+                        // Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectContacts()));
+                      },
+                      icon: Container(),
+                    ), //,
+                    fillColor: Colors.grey.shade200),
+              ),
+            ),
+            Container(
+              // height: 42,
+              padding: EdgeInsets.only(
+                  left: 20, right: 20, top: 10, bottom: 10),
+              child: Text(
+                "*If you are paying full outstanding balance you will save rs10.",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: appBlackColor,
+                    fontWeight: FontWeight.normal),
+              ),
+            ),
+            Container(
+              height: 5,
+              color: appGreyColor.withOpacity(0.5),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                // border: Border.all(color: Colors.grey,width: 1),
+                  color: appBlueGColor,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(15),
+                      bottomRight: Radius.circular(15))),
+
+              height: 20,
+              // color: Colors.black,
+            ),
+          ],
+        ),
+      );
+
+    }
+  }
+  Widget payButton(){
+    return
+      Container(
+        child: TextButton(
+          onPressed: () {
+            buttonSheetPage(_apps);
+          },
+          child: Container(
+            margin: const EdgeInsets.only(
+                left: 20, right: 20, bottom: 30, top: 40),
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: appRedBGColor,
+                borderRadius: BorderRadius.circular(10)),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              child: Center(
+                // PaymentDeclined
+                  child: Text(
+                    'Proceed to Pay',
+                    style: TextStyle(color: appWhiteColor),
+                  )),
+            ),
+          ),
+        ),
+      );
+
+  }
 
   Widget _appsGrid(List<ApplicationMeta> apps) {
     return Container(
@@ -543,7 +740,7 @@ class _BilPayState extends State<BilPay> {
               ),
               margin: EdgeInsets.symmetric(horizontal: 28),
               child: ListTile(
-                  // dense: true,
+                // dense: true,
 
                   onTap: () async {
                     setState(() {
@@ -557,7 +754,7 @@ class _BilPayState extends State<BilPay> {
                         borderRadius: BorderRadius.circular(5)),
                     child: const Padding(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       child: Text('Pay'),
                     ),
                   ),
@@ -567,15 +764,15 @@ class _BilPayState extends State<BilPay> {
                       Container(
                         child: selectIndex == index
                             ? Image.asset(
-                                "asset/Paymenticon/check1.png",
-                                height: 20,
-                                width: 20,
-                              )
+                          "asset/Paymenticon/check1.png",
+                          height: 20,
+                          width: 20,
+                        )
                             : Image.asset(
-                                "asset/Paymenticon/uncheck1.png",
-                                height: 20,
-                                width: 20,
-                              ),
+                          "asset/Paymenticon/uncheck1.png",
+                          height: 20,
+                          width: 20,
+                        ),
                         padding: EdgeInsets.only(right: 10),
                       ),
 
@@ -614,8 +811,8 @@ class _BilPayState extends State<BilPay> {
             width: 1,
           ),
           leading: Container(
-              // width: 20,
-              // color: Colors.red,
+            // width: 20,
+            // color: Colors.red,
               child: Radio(
                   value: 'Phonepay', groupValue: val, onChanged: (val) {})),
           title: SvgPicture.asset(
@@ -671,10 +868,9 @@ class _BilPayState extends State<BilPay> {
                             decoration: BoxDecoration(
                                 color: appWhiteColor,
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
+                                BorderRadius.all(Radius.circular(15))),
                             child: InkWell(
                               onTap: () {
-                                print("fdsvdf");
                                 Navigator.pop(context);
                               },
                               child: Image.asset(
@@ -721,7 +917,7 @@ class _BilPayState extends State<BilPay> {
                                     onTap: () {
                                       setState(() {
                                         selectIndex = index;
-                                        print("selectIndex : $selectIndex");
+                                        // print("selectIndex : $selectIndex");
                                         setState(() {});
                                       });
                                     },
@@ -733,15 +929,15 @@ class _BilPayState extends State<BilPay> {
                                         padding: const EdgeInsets.all(10.0),
                                         child: selectIndex == index
                                             ? Image.asset(
-                                                "asset/Paymenticon/check1.png",
-                                                height: 20,
-                                                width: 20,
-                                              )
+                                          "asset/Paymenticon/check1.png",
+                                          height: 20,
+                                          width: 20,
+                                        )
                                             : Image.asset(
-                                                "asset/Paymenticon/uncheck1.png",
-                                                height: 20,
-                                                width: 20,
-                                              ),
+                                          "asset/Paymenticon/uncheck1.png",
+                                          height: 20,
+                                          width: 20,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -784,11 +980,11 @@ class _BilPayState extends State<BilPay> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 15, vertical: 15),
                           child: Center(
-                              // PaymentDeclined
+                            // PaymentDeclined
                               child: Text(
-                            'Proceed to Pay',
-                            style: TextStyle(color: appWhiteColor),
-                          )),
+                                'Proceed to Pay',
+                                style: TextStyle(color: appWhiteColor),
+                              )),
                         ),
                       ),
                     ),

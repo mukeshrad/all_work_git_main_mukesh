@@ -23,7 +23,6 @@ class _SelectContactsState extends State<SelectContacts> {
     var status = await Permission.contacts.status;
 
     if (await Permission.contacts.request().isGranted) if (status.isGranted) {
-      print("isGranted");
       _load = true;
       setState(() {});
       listAppContacts = await ContactsService.getContacts();
@@ -33,14 +32,14 @@ class _SelectContactsState extends State<SelectContacts> {
       _load = false;
 
       setState(() {
-        print(listAppContacts.length);
+        // print(listAppContacts.length);
       });
     } else if (status.isDenied) {
-      print("isDenied");
+      // print("isDenied");
       getAllContactApp();
     }
 
-    print(status);
+    // print(status);
   }
 
   @override
@@ -62,7 +61,7 @@ class _SelectContactsState extends State<SelectContacts> {
       mobileNumber = (await MobileNumber.mobileNumber)!;
       // _simCard = (await MobileNumber.getSimCards)!;
     } on PlatformException catch (e) {
-      debugPrint("Failed to get mobile number because of '${e.message}'");
+      // debugPrint("Failed to get mobile number because of '${e.message}'");
     }
     if (!mounted) return;
 
@@ -82,62 +81,62 @@ class _SelectContactsState extends State<SelectContacts> {
         ),
         body: _load == true
             ? Center(
-                child: Container(
-                  color: Colors.white,
-                  // width: 70.0,
-                  height: 200.0,
-                  child: new Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: new Center(
-                          child: Column(
-                        children: [
-                          new CircularProgressIndicator(),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                            child: Text("Please wait..."),
-                          )
-                        ],
-                      ))),
-                ),
-              )
-            : Column(
-                children: [
-                  Container(
-                    color: Theme.of(context).primaryColor,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        child: ListTile(
-                          leading: new Icon(Icons.search),
-                          title: TextField(
-                            controller: _serachcontroller,
-                            decoration: const InputDecoration(
-                                hintText: 'Search', border: InputBorder.none),
-                            onChanged: onSearchTextChanged,
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.cancel),
-                            onPressed: () {
-                              _serachcontroller.clear();
-                              onSearchTextChanged('');
-                            },
-                          ),
+          child: Container(
+            color: Colors.white,
+            // width: 70.0,
+            height: 200.0,
+            child: new Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: new Center(
+                    child: Column(
+                      children: [
+                        new CircularProgressIndicator(),
+                        SizedBox(
+                          height: 20,
                         ),
-                      ),
+                        Container(
+                          child: Text("Please wait..."),
+                        )
+                      ],
+                    ))),
+          ),
+        )
+            : Column(
+          children: [
+            Container(
+              color: Theme.of(context).primaryColor,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: ListTile(
+                    leading: new Icon(Icons.search),
+                    title: TextField(
+                      controller: _serachcontroller,
+                      decoration: const InputDecoration(
+                          hintText: 'Search', border: InputBorder.none),
+                      onChanged: onSearchTextChanged,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.cancel),
+                      onPressed: () {
+                        _serachcontroller.clear();
+                        onSearchTextChanged('');
+                      },
                     ),
                   ),
-                  Expanded(
-                      child: ListView.builder(
-                    padding: EdgeInsets.only(top: 20),
-                    itemCount: listAppContacts.length,
-                    itemBuilder: (context, index) {
-                      return ContactsView(context, index);
-                    },
-                  ))
-                ],
-              ));
+                ),
+              ),
+            ),
+            Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(top: 20),
+                  itemCount: listAppContacts.length,
+                  itemBuilder: (context, index) {
+                    return ContactsView(context, index);
+                  },
+                ))
+          ],
+        ));
   }
 
   Widget ContactsView(BuildContext context, int index) {
@@ -164,7 +163,6 @@ class _SelectContactsState extends State<SelectContacts> {
     if (sWord != null) {
       fullName = fullName + " " + sWord[0];
     }
-    print(mobile);
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);

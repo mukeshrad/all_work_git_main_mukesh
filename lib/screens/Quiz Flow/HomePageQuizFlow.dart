@@ -23,38 +23,38 @@ class _QuizHomeState extends State<QuizHome> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-      appBar: AppBar(
-        title: Text('Quiz Home'),
-      ),
-      body: Container(
-          margin: EdgeInsets.only(top: 50),
-          alignment: Alignment.center,
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            verticalDirection: VerticalDirection.down,
+          appBar: AppBar(
+            title: Text('Quiz Home'),
+          ),
+          body: Container(
+              margin: EdgeInsets.only(top: 50),
+              alignment: Alignment.center,
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                verticalDirection: VerticalDirection.down,
 
-            children: [
-              ElevatedButton(
-                onPressed: bottomSheetCaseBack, // bottomModalSheet,
+                children: [
+                  ElevatedButton(
+                    onPressed: bottomSheetCaseBack, // bottomModalSheet,
 
-                child: Text(instant),
-              ),
-              ElevatedButton(
-                onPressed: bottomSheetAdditionCaseBack, // bottomModalSheet,
-                child: Text(additional),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => RCUploadImages()));
-                }, // bottomModalSheet,
-                child: Text(rcImageUpload),
-              )
-            ],
-          )),
-    ));
+                    child: Text(instant),
+                  ),
+                  ElevatedButton(
+                    onPressed: bottomSheetAdditionCaseBack, // bottomModalSheet,
+                    child: Text(additional),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RCUploadImages()));
+                    }, // bottomModalSheet,
+                    child: Text(rcImageUpload),
+                  )
+                ],
+              )),
+        ));
   }
 
   void bottomSheetCaseBack() {
@@ -220,7 +220,7 @@ class _QuizHomeState extends State<QuizHome> {
                           decoration: const BoxDecoration(
                               color: appWhiteColor,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
+                              BorderRadius.all(Radius.circular(15))),
                           child: InkWell(
                             onTap: () {
                               Navigator.pop(context);
@@ -251,7 +251,7 @@ class _QuizHomeState extends State<QuizHome> {
                               ),
                               Container(
                                 margin:
-                                    const EdgeInsets.only(left: 30, right: 30),
+                                const EdgeInsets.only(left: 30, right: 30),
                                 alignment: Alignment.centerLeft,
                                 child: const Text(
                                   'Enter Vehicle Number',
@@ -329,9 +329,9 @@ class _QuizHomeState extends State<QuizHome> {
                                   horizontal: 15, vertical: 15),
                               child: Center(
                                   child: Text(
-                                'Submit',
-                                style: TextStyle(color: appWhiteColor),
-                              )),
+                                    'Submit',
+                                    style: TextStyle(color: appWhiteColor),
+                                  )),
                             ),
                           ),
                         ),

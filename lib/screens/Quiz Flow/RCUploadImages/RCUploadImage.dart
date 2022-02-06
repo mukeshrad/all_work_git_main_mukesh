@@ -51,9 +51,9 @@ class _RCUploadImagesState extends State<RCUploadImages> {
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                         child: Text(
-                      'Submit',
-                      style: TextStyle(color: appWhiteColor),
-                    )),
+                          'Submit',
+                          style: TextStyle(color: appWhiteColor),
+                        )),
                   ),
                 ),
               ),
@@ -86,13 +86,13 @@ class _RCUploadImagesState extends State<RCUploadImages> {
             children: [
               Expanded(
                   child: Center(
-                child: Image.asset(
-                  "assets/images/frontSideCam.png",
-                  fit: BoxFit.cover,
-                  height: 70,
-                  width: 70,
-                ),
-              )),
+                    child: Image.asset(
+                      "assets/images/frontSideCam.png",
+                      fit: BoxFit.cover,
+                      height: 70,
+                      width: 70,
+                    ),
+                  )),
               Container(
                   width: double.infinity,
                   height: 44,
@@ -132,13 +132,13 @@ class _RCUploadImagesState extends State<RCUploadImages> {
             children: [
               Expanded(
                   child: Center(
-                child: Image.asset(
-                  "assets/images/backSideCam.png",
-                  fit: BoxFit.cover,
-                  height: 70,
-                  width: 70,
-                ),
-              )),
+                    child: Image.asset(
+                      "assets/images/backSideCam.png",
+                      fit: BoxFit.cover,
+                      height: 70,
+                      width: 70,
+                    ),
+                  )),
               Container(
                   width: double.infinity,
                   height: 44,
@@ -217,9 +217,9 @@ class _RCUploadImagesState extends State<RCUploadImages> {
                 new ListTile(
                     title: new Text('Gallery'),
                     onTap: () => {
-                          // imageSelector(context, "gallery"),
-                          Navigator.pop(context),
-                        }),
+                      // imageSelector(context, "gallery"),
+                      Navigator.pop(context),
+                    }),
                 new ListTile(
                   title: new Text('Camera'),
                   onTap: () => {

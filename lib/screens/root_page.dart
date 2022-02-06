@@ -8,9 +8,7 @@ import 'package:finandy/utils/main_app_bar.dart';
 import 'package:finandy/utils/nav_drawer.dart';
 import 'package:finandy/utils/rewards_and_offers.dart';
 import 'package:flutter/material.dart';
-
 import 'Payment/Bil_Pay.dart';
-import 'Payment/Quick Pay/QuickPay.dart';
 import 'Quiz Flow/HomePageQuizFlow.dart';
 
 class RootPage extends StatefulWidget {
@@ -137,7 +135,7 @@ class _RootPageState extends State<RootPage> {
                 onTap: () {
 
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => QuickPay()));
+                      MaterialPageRoute(builder: (context) => PayInformation(isScreen: "quickPay",)));
 
                 },
                 child: Container(

@@ -23,10 +23,10 @@ class _PaymentRequestSendState extends State<PaymentRequestSend> {
   }
 
   updateTimer() {
+
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       counter++;
 
-      print(counter);
       if (counter == totalSecondsExpire) {
         timer.cancel();
       }

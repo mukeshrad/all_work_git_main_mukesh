@@ -30,11 +30,9 @@ class _UpiApsListState extends State<UpiApsList> {
 
     Future.delayed(Duration(milliseconds: 0), () async {
       _apps = (await UpiPay.getInstalledUpiApplications(
-              statusType: UpiApplicationDiscoveryAppStatusType.all))
+          statusType: UpiApplicationDiscoveryAppStatusType.all))
           .cast<ApplicationMeta>();
       setState(() {});
-      print(_apps?.length);
-      print("--------- -- -- -- - -- -- - ");
     });
   }
 
@@ -75,12 +73,10 @@ class _UpiApsListState extends State<UpiApsList> {
     //   _upiAddrError = null;
     // });
 
+    //:- Add TODO for actual integration.
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
-    print("Starting transaction with id $transactionRef");
-
     String price = "10.0";
     String upi = "7220858116@apl";
-
     final paymentResponce = await UpiPay.initiateTransaction(
       amount: price,
       app: app.upiApplication,
@@ -91,8 +87,6 @@ class _UpiApsListState extends State<UpiApsList> {
       // merchantCode: '7372',
     );
 
-    print(paymentResponce.toString());
-
     if (paymentResponce.status == UpiTransactionStatus.failure) {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => PaymentDeclined()));
@@ -100,11 +94,9 @@ class _UpiApsListState extends State<UpiApsList> {
       var now = DateTime.now();
       var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
       String getDate = formatter1.format(now);
-      print(getDate);
 
       var formatter2 = new DateFormat('hh:mm a'); //yyyy-MM-dd
       String getTime = formatter2.format(now);
-      print(getTime);
 
       var paymentDetails = UpiPaymentResponse();
       paymentDetails.amount = "₹ " + price;
@@ -116,9 +108,9 @@ class _UpiApsListState extends State<UpiApsList> {
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => PaymentReceived(
-                paymenData: paymentDetails,
-                isFrome: 'BilPay',
-              )));
+            paymenData: paymentDetails,
+            isFrome: 'BilPay',
+          )));
     } else {
       if (io.Platform.isAndroid) {
         _showAlert(context, paymentResponce.rawResponse.toString());
@@ -132,9 +124,9 @@ class _UpiApsListState extends State<UpiApsList> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: const Text("Response"),
-              content: Text(text),
-            ));
+          title: const Text("Response"),
+          content: Text(text),
+        ));
   }
 
   Widget _appsGrid(List<ApplicationMeta> apps) {
@@ -157,25 +149,11 @@ class _UpiApsListState extends State<UpiApsList> {
               ),
               margin: EdgeInsets.symmetric(horizontal: 28),
               child: ListTile(
-                  // dense: true,
+                // dense: true,
 
                   onTap: () async {
-                    // print(apps[index].upiApplication.androidPackageName);
-
-                    // print("Phone tap");
-                    // initiateTransaction();
 
                     await _onTap(apps[index]);
-
-                    // await LaunchApp.isAppInstalled(
-                    //     androidPackageName: item.upiApplication.androidPackageName,
-                    //     iosUrlScheme: 'pulsesecure://'
-                    // );
-
-                    // await LaunchApp.isAppInstalled(
-                    //     androidPackageName: item.upiApplication.androidPackageName
-                    //     // iosUrlScheme: 'pulsesecure://'
-                    // );
                   },
                   trailing: Container(
                     decoration: BoxDecoration(
@@ -183,7 +161,7 @@ class _UpiApsListState extends State<UpiApsList> {
                         borderRadius: BorderRadius.circular(5)),
                     child: const Padding(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       child: Text('Pay'),
                     ),
                   ),
@@ -197,9 +175,9 @@ class _UpiApsListState extends State<UpiApsList> {
                             value: apps[index].upiApplication.getAppName(),
                             groupValue: "",
                             onChanged: (val) {
-                              print(apps[index]
-                                  .upiApplication
-                                  .androidPackageName);
+                              // print(apps[index]
+                              //     .upiApplication
+                              //     .androidPackageName);
                             }),
                       ),
                       apps[index].iconImage(24),

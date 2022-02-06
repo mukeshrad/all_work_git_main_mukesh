@@ -80,7 +80,7 @@ class _PaymentReceivedState extends State<PaymentReceived> {
                 margin: EdgeInsets.only(top: 20, bottom: 20),
                 height: 84,
                 decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(32)),
+                BoxDecoration(borderRadius: BorderRadius.circular(32)),
                 child: Image.asset(
                   "asset/Paymenticon/verifyed.png",
                   width: 64,
@@ -158,15 +158,15 @@ class _PaymentReceivedState extends State<PaymentReceived> {
                                     itemBuilder: (context, index) {
                                       final item = paymentListName[index];
                                       final itemvalue =
-                                          paymentListNameValue[index];
+                                      paymentListNameValue[index];
                                       return Container(
                                         height: 30,
                                         // color: appBlackColor,
                                         child: Row(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.center,
+                                          CrossAxisAlignment.center,
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(item + " : ",
                                                 textAlign: TextAlign.center,
@@ -174,7 +174,7 @@ class _PaymentReceivedState extends State<PaymentReceived> {
                                                     color: appGreyDarkColor,
                                                     fontSize: 14,
                                                     fontWeight:
-                                                        FontWeight.normal)),
+                                                    FontWeight.normal)),
                                             // Text((" "+itemvalue),textAlign: TextAlign.right,
                                             //     overflow: TextOverflow.ellipsis,
                                             //     softWrap: false,style: TextStyle(color: appBlackColor,fontSize: 14,fontWeight: FontWeight.bold)),
@@ -188,7 +188,7 @@ class _PaymentReceivedState extends State<PaymentReceived> {
                                                     color: appBlackColor,
                                                     fontSize: 14,
                                                     fontWeight:
-                                                        FontWeight.bold),
+                                                    FontWeight.bold),
                                               ),
                                             ),
                                             // Text(" "+itemvalue,textAlign: TextAlign.center,style: TextStyle(color: appBlackColor,fontSize: 14,fontWeight: FontWeight.normal)),
@@ -250,19 +250,19 @@ class _PaymentReceivedState extends State<PaymentReceived> {
                       left: 25, right: 25, bottom: 30, top: 10),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      // widget.isFrome == "isFrome" ? appGreyColor : appBlueGColor
+                    // widget.isFrome == "isFrome" ? appGreyColor : appBlueGColor
                       color: appBlueGColor,
                       borderRadius: BorderRadius.circular(10)),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                         child: Text(
-                      'Home',
-                      style: TextStyle(
-                          color: appWhiteColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal),
-                    )),
+                          'Home',
+                          style: TextStyle(
+                              color: appWhiteColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.normal),
+                        )),
                   ),
                 ),
               ),

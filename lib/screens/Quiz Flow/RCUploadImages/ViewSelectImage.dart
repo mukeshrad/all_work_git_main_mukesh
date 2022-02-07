@@ -37,9 +37,9 @@ class _ViewRCSelectImageState extends State<ViewRCSelectImage> {
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                         child: Text(
-                          'Submit',
-                          style: TextStyle(color: appWhiteColor),
-                        )),
+                      'Submit',
+                      style: TextStyle(color: appWhiteColor),
+                    )),
                   ),
                 ),
               ),
@@ -62,9 +62,9 @@ class _ViewRCSelectImageState extends State<ViewRCSelectImage> {
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                         child: Text(
-                          'Submit',
-                          style: TextStyle(color: appWhiteColor),
-                        )),
+                      'Submit',
+                      style: TextStyle(color: appWhiteColor),
+                    )),
                   ),
                 ),
               ),
@@ -78,15 +78,15 @@ class _ViewRCSelectImageState extends State<ViewRCSelectImage> {
     switch (pickerType) {
       case "gallery":
 
-      /// GALLERY IMAGE PICKER
-      //   imageFile = await ImagePicker.pickImage(
-      //       source: ImageSource.gallery, imageQuality: 90);
-      //   break;
+        /// GALLERY IMAGE PICKER
+        //   imageFile = await ImagePicker.pickImage(
+        //       source: ImageSource.gallery, imageQuality: 90);
+        //   break;
         final ImagePicker _picker = ImagePicker();
 
         try {
           final pickedFile =
-          await _picker.pickImage(source: ImageSource.gallery);
+              await _picker.pickImage(source: ImageSource.gallery);
           setState(() {
             // print(pickedFile?.name.toString());
             // _imageFile = pickedFile;
@@ -99,14 +99,14 @@ class _ViewRCSelectImageState extends State<ViewRCSelectImage> {
         break;
 
       case "camera": // CAMERA CAPTURE CODE
-      // imageFile = await ImagePicker.pickImage(
-      //     source: ImageSource.camera, imageQuality: 90);
+        // imageFile = await ImagePicker.pickImage(
+        //     source: ImageSource.camera, imageQuality: 90);
 
         final ImagePicker _picker = ImagePicker();
 
         try {
           final pickedFile =
-          await _picker.pickImage(source: ImageSource.camera);
+              await _picker.pickImage(source: ImageSource.camera);
           setState(() {
             // print(pickedFile?.name.toString());
             // _imageFile = pickedFile;

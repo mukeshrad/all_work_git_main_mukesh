@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:finandy/constants/Colors.dart';
 import 'package:finandy/constants/texts.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'RCUploadImages/RCUploadImage.dart';
@@ -27,35 +26,48 @@ class _QuizHomeState extends State<QuizHome> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-      appBar: AppBar(
-        title: Text('Quiz Home'),
-      ),
-      body: Container(
-          margin: EdgeInsets.only(top: 50),
-          alignment: Alignment.center,
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            verticalDirection: VerticalDirection.down,
+          appBar: AppBar(
+            title: Text('Quiz Home'),
+          ),
+          body: Container(
+              margin: EdgeInsets.only(top: 50),
+              alignment: Alignment.center,
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                verticalDirection: VerticalDirection.down,
 
-            children: [
-              ElevatedButton(
-                onPressed: bottomSheetCaseBack, // bottomModalSheet,
+                children: [
+                  ElevatedButton(
+                    onPressed: bottomSheetCaseBack, // bottomModalSheet,
 
-                child: Text(instant),
-              ),
-              ElevatedButton(
-                onPressed: bottomSheetAdditionCaseBack, // bottomModalSheet,
-                child: Text(additional),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  bottomSheetUplodeRCImages();
-                }, // bottomModalSheet,
-                child: Text(rcImageUpload),
-              )
-            ],
-          )),
-    ));
+                    child: Text(instant),
+                  ),
+                  ElevatedButton(
+                    onPressed: bottomSheetAdditionCaseBack, // bottomModalSheet,
+                    child: Text(additional),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+
+                      List<File> result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RCUploadImages()));
+
+                      print("object : ${result.first}");
+                      _txtRCImageControler.text =
+                          result.first.path.toString();
+
+                      setState(() => () {
+                        // fileName = "deepak.png";
+                      });
+                      // bottomSheetUplodeRCImages();
+                    }, // bottomModalSheet,
+                    child: Text(rcImageUpload),
+                  )
+                ],
+              )),
+        ));
   }
 
   void bottomSheetCaseBack() {
@@ -221,7 +233,7 @@ class _QuizHomeState extends State<QuizHome> {
                           decoration: const BoxDecoration(
                               color: appWhiteColor,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
+                              BorderRadius.all(Radius.circular(15))),
                           child: InkWell(
                             onTap: () {
                               Navigator.pop(context);
@@ -252,7 +264,7 @@ class _QuizHomeState extends State<QuizHome> {
                               ),
                               Container(
                                 margin:
-                                    const EdgeInsets.only(left: 30, right: 30),
+                                const EdgeInsets.only(left: 30, right: 30),
                                 alignment: Alignment.centerLeft,
                                 child: const Text(
                                   'Enter Vehicle Number',
@@ -330,9 +342,9 @@ class _QuizHomeState extends State<QuizHome> {
                                   horizontal: 15, vertical: 15),
                               child: Center(
                                   child: Text(
-                                'Submit',
-                                style: TextStyle(color: appWhiteColor),
-                              )),
+                                    'Submit',
+                                    style: TextStyle(color: appWhiteColor),
+                                  )),
                             ),
                           ),
                         ),
@@ -388,7 +400,7 @@ class _QuizHomeState extends State<QuizHome> {
                           decoration: const BoxDecoration(
                               color: appWhiteColor,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
+                              BorderRadius.all(Radius.circular(15))),
                           child: InkWell(
                             onTap: () {
                               Navigator.pop(context);
@@ -419,7 +431,7 @@ class _QuizHomeState extends State<QuizHome> {
                               ),
                               Container(
                                 margin:
-                                    const EdgeInsets.only(left: 30, right: 30),
+                                const EdgeInsets.only(left: 30, right: 30),
                                 alignment: Alignment.centerLeft,
                                 child: const Text(
                                   'Upload Image of RC',
@@ -446,18 +458,18 @@ class _QuizHomeState extends State<QuizHome> {
                             onTap: () async {
                               FocusScope.of(context).requestFocus(FocusNode());
 
-                              List<File> result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RCUploadImages()));
-
-                              print("object : ${result.first}");
-                              _txtRCImageControler.text =
-                                  result.first.path.toString();
-
-                              setState(() => () {
-                                    fileName = "deepak.png";
-                                  });
+                              // List<File> result = await Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => RCUploadImages()));
+                              //
+                              // print("object : ${result.first}");
+                              // _txtRCImageControler.text =
+                              //     result.first.path.toString();
+                              //
+                              // setState(() => () {
+                              //   fileName = "deepak.png";
+                              // });
                             },
                             cursorColor: Colors.black,
                             controller: _txtRCImageControler,
@@ -522,9 +534,9 @@ class _QuizHomeState extends State<QuizHome> {
                                   horizontal: 15, vertical: 15),
                               child: Center(
                                   child: Text(
-                                'Submit',
-                                style: TextStyle(color: appWhiteColor),
-                              )),
+                                    'Submit',
+                                    style: TextStyle(color: appWhiteColor),
+                                  )),
                             ),
                           ),
                         ),
@@ -556,7 +568,7 @@ class _QuizHomeState extends State<QuizHome> {
         });
   }
 
-  //Navigator.push(
+//Navigator.push(
 //                           context,
 //                           MaterialPageRoute(
 //                               builder: (context) => RCUploadImages()));

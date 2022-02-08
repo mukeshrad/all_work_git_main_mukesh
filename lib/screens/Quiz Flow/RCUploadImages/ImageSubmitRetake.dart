@@ -36,7 +36,7 @@ class _RetakeImageSubmitState extends State<RetakeImageSubmit> {
                     border: Border.all(color: appBlueGColor, width: 1),
                     borderRadius: BorderRadius.circular(5)),
                 margin:
-                    EdgeInsets.only(top: 100, left: 30, right: 30, bottom: 10),
+                EdgeInsets.only(top: 100, left: 30, right: 30, bottom: 10),
                 width: double.infinity,
                 child: Column(
                   children: [
@@ -85,9 +85,9 @@ class _RetakeImageSubmitState extends State<RetakeImageSubmit> {
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     child: Center(
                         child: Text(
-                      'Submit',
-                      style: TextStyle(color: appWhiteColor),
-                    )),
+                          'Submit',
+                          style: TextStyle(color: appWhiteColor),
+                        )),
                   ),
                 ),
               ),
@@ -97,14 +97,14 @@ class _RetakeImageSubmitState extends State<RetakeImageSubmit> {
               margin: EdgeInsets.only(bottom: 40),
               child: TextButton(
                 onPressed: () async {
+
                   final ImagePicker _picker = ImagePicker();
                   //
                   try {
                     final pickedFile =
-                        await _picker.pickImage(source: ImageSource.camera);
+                    await _picker.pickImage(source: ImageSource.camera);
                     setState(() {
-                      print(pickedFile?.name.toString());
-
+                      // print(pickedFile?.name.toString());
                       if (pickedFile != null) {
                         var imageFile = File(pickedFile.path);
 
@@ -124,18 +124,18 @@ class _RetakeImageSubmitState extends State<RetakeImageSubmit> {
                       left: 20, right: 20, bottom: 0, top: 0),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      // color: appBlueGColor,
+                    // color: appBlueGColor,
                       borderRadius: BorderRadius.circular(10)),
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                     child: Center(
                         child: Text(
-                      'Retake',
-                      style: TextStyle(
-                        color: appBlackColor,
-                        decoration: TextDecoration.underline,
-                      ),
-                    )),
+                          'Retake',
+                          style: TextStyle(
+                            color: appBlackColor,
+                            decoration: TextDecoration.underline,
+                          ),
+                        )),
                   ),
                 ),
               ),

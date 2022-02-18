@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class UsedButton extends StatelessWidget {
-  final String buttonName;
+  final Widget buttonName;
   final VoidCallback onpressed;
+  final Widget? prefix;
   const UsedButton({
     Key? key,
     required this.buttonName,
     required this.onpressed,
+    this.prefix,
   }) : super(key: key);
 
   @override
@@ -14,15 +16,21 @@ class UsedButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onpressed,
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Color(0xff818181)),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        backgroundColor: MaterialStateProperty.all(Color(0xff084E6C)),
       ),
       child: Padding(
         padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-        child: Center(
-          child: Text(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            prefix ?? Container(),
             buttonName,
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.0),
-          ),
+          ],
         ),
       ),
     );

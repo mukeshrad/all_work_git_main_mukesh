@@ -75,12 +75,12 @@ class _UpiApsListState extends State<UpiApsList> {
 
     //:- Add TODO for actual integration.
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
-    String price = "10.0";
-    String upi = "7220858116@apl";
+    String price = "10.00";
+    String upi = "9461822388@okbizaxis";
     final paymentResponce = await UpiPay.initiateTransaction(
       amount: price,
       app: app.upiApplication,
-      receiverName: 'Sharad',
+      receiverName: 'Mukesh',
       receiverUpiAddress: upi,
       transactionRef: transactionRef,
       transactionNote: 'UPI Payment',

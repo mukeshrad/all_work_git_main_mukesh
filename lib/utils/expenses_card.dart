@@ -1,104 +1,108 @@
 import 'package:finandy/screens/Payment/Bil_Pay.dart';
+import 'package:finandy/modals/bill.dart';
+import 'package:finandy/modals/card_schema.dart';
+import 'package:finandy/utils/widget_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'expense_bar.dart';
 
 class ExpensesCard extends StatefulWidget {
-  const ExpensesCard({Key? key}) : super(key: key);
+  const ExpensesCard({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _ExpensesCardState createState() => _ExpensesCardState();
 }
 
 class _ExpensesCardState extends State<ExpensesCard> {
+  late double availableLimit;
+  late double limit;
+
+  @override
+  void initState() {
+    super.initState();
+     setState(() {
+
+     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [Text("Total Card Limit"), Text("Dec 10, 2019")],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "₹ 4000.00",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  GestureDetector(
-                      onTap: () {
-
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => PayInformation(isScreen: "bilPay",)));
-                      },
-                      child: Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: Colors.redAccent,
-                              border: Border.all(
-                                  color: Colors.redAccent,
-                                  style: BorderStyle.solid),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(5))),
-                          child: const Text(
-                            "Pay Bill",
-                            style: TextStyle(color: Colors.white, fontSize: 12),
-                          )))
+      availableLimit = Provider.of<BillSchema>(context, listen: false) != null ? (Provider.of<CardSchema>(context, listen: false).limits!.monthly!.toDouble() - Provider.of<BillSchema>(context, listen: false).amount as double) : 0;
+      limit = Provider.of<CardSchema>(context, listen: false).limits!.monthly!.toDouble();
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      child: elevatedContainer(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 3),
+                        child: const Text("Monthly Limit",
+                          style: TextStyle(
+                            fontSize: 16
+                          ),
+                          )
+                        ),
+                      Text(
+                            "₹ $limit",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                    ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Container(
+                       margin: const EdgeInsets.only(bottom: 3),
+                       child: const Text(
+                         "Available Monthly Limit",
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                         )
+                       ),
+                     Text(
+                        "₹ $availableLimit",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                   ],
+                ),
                 ],
+            ),
               ),
-            ),
-            const ExpenseBar(
-              label: "expense",
-              spendingAmount: 1000,
-              spendingPctOfTotal: 0.4,
-              color: Colors.red,
-              height: 30.0,
-              border: true,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("Available Weekly Limit"),
-                  Text("Payment Due")
-                ],
+               ExpenseBar(
+                label: "expense",
+                spendingAmount: limit,
+                spendingPctOfTotal: (limit == 0 ? 0 : availableLimit/limit),
+                color: Colors.red,
+                height: 20.0,
+                border: true,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "₹ 1000.00",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Text(
-                    "₹ 500.00",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

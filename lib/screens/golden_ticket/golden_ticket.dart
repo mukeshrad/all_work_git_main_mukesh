@@ -52,10 +52,10 @@ class _GoldenTicketState extends State<GoldenTicket> {
     return AppBar(
       backgroundColor: Colors.white,
       iconTheme: const IconThemeData(
-        color: Colors.black,
+        color: Color(0xff084E6C),
       ),
       title: const Text(
-        'GoldenTicket',
+        'Golden Tickets',
         style: TextStyle(color: Colors.black),
       ),
       bottom: const TabBar(
@@ -63,15 +63,15 @@ class _GoldenTicketState extends State<GoldenTicket> {
           fontWeight: FontWeight.normal,
           fontSize: 18.0,
         ),
-        labelColor: Color(0xff141414),
+        labelColor: Color(0xff084E6C),
         labelStyle: TextStyle(
           fontSize: 18.0,
           fontWeight: FontWeight.w600,
         ),
         labelPadding: EdgeInsets.only(bottom: 10.0),
-        unselectedLabelColor: Color(0xff141414),
-        indicatorColor: Color(0xff141414),
-        indicatorWeight: 5,
+        unselectedLabelColor: Color(0xff5C5C5C),
+        indicatorColor: Color(0xff084E6C),
+        indicatorWeight: 2,
         // isScrollable: true,
         tabs: <Tab>[
           Tab(

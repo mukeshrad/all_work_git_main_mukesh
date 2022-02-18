@@ -9,6 +9,7 @@ class SharedCard extends StatelessWidget {
   final String ticketStatus;
   final String creditScoreStatus;
   final VoidCallback onTapShare;
+  final Color colorOfCreditScoreStatus;
   const SharedCard({
     Key? key,
     required this.creditScoreStatus,
@@ -19,6 +20,7 @@ class SharedCard extends StatelessWidget {
     required this.ticketStatus,
     required this.validDate,
     required this.onTapShare,
+    required this.colorOfCreditScoreStatus,
   }) : super(key: key);
 
   @override
@@ -26,13 +28,17 @@ class SharedCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Card(
-        color: const Color(0xffF3F3F3),
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+        color: const Color(0xffFFFFFF),
         child: Column(
           children: [
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.black,
                 radius: 15.0,
+                backgroundImage: NetworkImage(
+                    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHw%3D&w=1000&q=80'),
               ),
               title: Text(
                 personName,
@@ -71,9 +77,10 @@ class SharedCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Divider(
-                    thickness: 1,
+                  const SizedBox(
+                    height: 10.0,
                   ),
+                  const MySeparator(color: Color(0xff084E6C)),
                   const SizedBox(
                     height: 16.0,
                   ),
@@ -89,7 +96,7 @@ class SharedCard extends StatelessWidget {
                                 fontSize: 14.0, color: Color(0xff5C5C5C)),
                           ),
                           const SizedBox(
-                            width: 6.0,
+                            height: 6.0,
                           ),
                           Text(
                             phoneNo,
@@ -114,7 +121,7 @@ class SharedCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(
-                            width: 6.0,
+                            height: 6.0,
                           ),
                           Text(
                             refferedOnDate,
@@ -141,7 +148,7 @@ class SharedCard extends StatelessWidget {
                                 fontSize: 14.0, color: Color(0xff5C5C5C)),
                           ),
                           const SizedBox(
-                            width: 6.0,
+                            height: 6.0,
                           ),
                           Text(
                             ticketStatus,
@@ -166,12 +173,13 @@ class SharedCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(
-                            width: 6.0,
+                            height: 6.0,
                           ),
                           Text(
                             creditScoreStatus,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14.0,
+                              color: colorOfCreditScoreStatus,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -182,9 +190,7 @@ class SharedCard extends StatelessWidget {
                   const SizedBox(
                     height: 17.0,
                   ),
-                  const Divider(
-                    thickness: 1,
-                  ),
+                  const MySeparator(color: Color(0xff084E6C)),
                   const SizedBox(
                     height: 15.0,
                   ),
@@ -193,15 +199,19 @@ class SharedCard extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Icon(Icons.share),
+                        Icon(
+                          Icons.share,
+                          color: Color(0xff0D406A),
+                        ),
                         SizedBox(
-                          width: 14.5,
+                          height: 14.5,
                         ),
                         Text(
                           'Share Golden Ticket',
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w500,
+                            color: Color(0xff0D406A),
                           ),
                         ),
                       ],
@@ -216,6 +226,38 @@ class SharedCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MySeparator extends StatelessWidget {
+  final double height;
+  final Color color;
+
+  const MySeparator({this.height = 1, this.color = Colors.black});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final boxWidth = constraints.constrainWidth();
+        final dashWidth = 2.0;
+        final dashHeight = height;
+        final dashCount = (boxWidth / (2 * dashWidth)).floor();
+        return Flex(
+          children: List.generate(dashCount, (_) {
+            return SizedBox(
+              width: dashWidth,
+              height: dashHeight,
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: color),
+              ),
+            );
+          }),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          direction: Axis.horizontal,
+        );
+      },
     );
   }
 }

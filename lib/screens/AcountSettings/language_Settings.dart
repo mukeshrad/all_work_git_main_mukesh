@@ -22,12 +22,12 @@ class _LanguageSettingsState extends State<LanguageSettings> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              NewAppBar(pageName: 'Language'),
-              SizedBox(
-                height: 29.0,
+              const NewAppBar(pageName: 'Language'),
+              const SizedBox(
+                height: 31.0,
               ),
               buildTileWithRadio(tileName: 'English', val: Language.English),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               buildTileWithRadio(tileName: 'Hindi', val: Language.Hindi),
@@ -38,13 +38,44 @@ class _LanguageSettingsState extends State<LanguageSettings> {
     );
   }
 
+  showAlertDialog(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text(
+        "OK",
+        style: TextStyle(fontWeight: FontWeight.w600),
+      ),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("Hindi not Available"),
+      content: const Text(
+          "This feature is curently under development. Sorry for the inconveniences!"),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Container buildTileWithRadio(
       {required String tileName, required Language val}) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.0),
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.grey,
+          color: Colors.grey.shade300,
         ),
         borderRadius: BorderRadius.circular(5.0),
       ),
@@ -64,13 +95,19 @@ class _LanguageSettingsState extends State<LanguageSettings> {
             ),
           ),
           Radio<Language>(
-            activeColor: Colors.black,
+            activeColor: Color(0xffDD2E44),
             value: val,
             groupValue: _language,
             onChanged: (value) {
-              setState(() {
-                _language = value!;
-              });
+              if (value == Language.Hindi) {
+                print('b');
+                showAlertDialog(context);
+              } else {
+                print('a');
+                setState(() {
+                  _language = value!;
+                });
+              }
             },
           ),
         ],

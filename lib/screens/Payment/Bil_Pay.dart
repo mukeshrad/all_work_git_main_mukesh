@@ -38,17 +38,6 @@ class _PayInformationState extends State<PayInformation> {
   final txtEnterAmount = TextEditingController();
   var currentDate = "";
 
-  initiateTransaction() async {
-    String upiUrl =
-        'upi://pay?pa=7220858116@apl&pn=Deepak Kumar&am=10.0&cu=INR';
-    await launch(upiUrl).then((value) {
-      if (kDebugMode) {
-        // print(value);
-      }
-    }).catchError((err) =>
-        print(err)
-    );
-  }
 
   Future<void> _onTap(ApplicationMeta app) async {
 
@@ -56,13 +45,13 @@ class _PayInformationState extends State<PayInformation> {
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
     // print("Starting transaction with id $transactionRef");
 
-    String price = "10.0";
-    String upi = "7220858116@apl";
+    String price = "01.00";
+    String upi = "q53235427@ybl";
 
     final paymentResponce = await UpiPay.initiateTransaction(
       amount: price,
       app: app.upiApplication,
-      receiverName: 'Sharad',
+      receiverName: 'Mukesh Kumawat',
       receiverUpiAddress: upi,
       transactionRef: transactionRef,
       transactionNote: 'UPI Payment',
@@ -127,7 +116,7 @@ class _PayInformationState extends State<PayInformation> {
 
     payInfoTypeScreen = widget.isScreen;
 
-    print("widget.isScreen : $payInfoTypeScreen");
+    // print("widget.isScreen : $payInfoTypeScreen");
 
     setState(() {
 

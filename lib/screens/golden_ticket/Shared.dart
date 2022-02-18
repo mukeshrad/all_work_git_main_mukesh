@@ -23,6 +23,7 @@ class _SharedGoldenTicketState extends State<SharedGoldenTicket> {
           ticketStatus: 'Redeemed',
           creditScoreStatus: 'Failed',
           onTapShare: () {},
+          colorOfCreditScoreStatus: Color(0xffFF5130),
         ),
         SharedCard(
           profilePhoto: 'null',
@@ -33,6 +34,18 @@ class _SharedGoldenTicketState extends State<SharedGoldenTicket> {
           ticketStatus: 'Pending',
           creditScoreStatus: '-',
           onTapShare: () {},
+          colorOfCreditScoreStatus: Colors.black,
+        ),
+        SharedCard(
+          profilePhoto: 'null',
+          personName: 'Aditya singh',
+          validDate: 'Nov 30,2022',
+          phoneNo: '9876543212',
+          refferedOnDate: 'Nov 26,2021-11:00 AM',
+          ticketStatus: 'Pending',
+          creditScoreStatus: 'Success',
+          onTapShare: () {},
+          colorOfCreditScoreStatus: Color(0xff05C46B),
         ),
       ],
     );

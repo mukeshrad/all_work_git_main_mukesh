@@ -8,14 +8,14 @@ class ActivateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: mainAppBar(context),
+      appBar: MainAppBar(appBar: AppBar(), title: "rootPage"),
       body: Container(
         margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const UptrackCard(bankName: "Bank Name", cardNumber: "XXXX XXXX XXXX XXXX", cardType: "Card Type", expiry: "XX/XX", ownerName: "Shivam",),
+            const UptrackCard(bankName: "Bank Name", cardNoTitle: "Card Number",cardNumber: "XXXX XXXX XXXX XXXX", cardType: "Card Type", expiry: "XX/XX", ownerName: "Shivam", monthlyLimit: "XXXX"),
             Container(
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   child: ElevatedButton(onPressed: (){

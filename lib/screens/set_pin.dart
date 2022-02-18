@@ -1,6 +1,8 @@
 import 'package:finandy/constants/texts.dart';
+import 'package:finandy/modals/card_schema.dart';
 import 'package:finandy/utils/credit_card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SetPin extends StatefulWidget {
   const SetPin({ Key? key }) : super(key: key);
@@ -33,7 +35,7 @@ class _SetPinState extends State<SetPin> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
              children: [
-                const UptrackCard(bankName: "Bank Name", cardNumber: "1212 1212 1212 1212", cardType: "Card Type", expiry: "02/26",ownerName: "Shivam",),
+               UptrackCard(bankName: "${context.watch<CardSchema>().bankName}", cardNumber: "${context.watch<CardSchema>().cardNumber}", cardType: "${context.watch<CardSchema>().cardType}", expiry: "${context.watch<CardSchema>().expiry}",ownerName: "${context.watch<CardSchema>().ownerName}", cardNoTitle: "Card Number", monthlyLimit: "${context.watch<CardSchema>().limits!.monthly}"),
                Column(
                  children: [
                    TextFormField(

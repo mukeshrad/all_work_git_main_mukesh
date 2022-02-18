@@ -1,8 +1,11 @@
+import 'package:finandy/constants/texts.dart';
 import 'package:finandy/modals/customer.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+// import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/src/provider.dart';
+// import 'package:provider/src/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:swagger/api.dart';
@@ -18,6 +21,8 @@ class PersonalInfo extends StatefulWidget {
 }
 
 class _PersonalInfo extends State<PersonalInfo> {
+  late Image aadharLogo;
+
   TextEditingController aadharController = TextEditingController();
   TextEditingController dobController = TextEditingController();
   DateTime selectedDate = DateTime.now();
@@ -61,16 +66,23 @@ class _PersonalInfo extends State<PersonalInfo> {
     }
   }
 
-  //  sendRequest() async{
-  //   //  final res = await api_instance.v1UsersUserIdGet("61dd468b5e346c001d24037f");
-  //   //  print(res.toString());
-  //   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const OTPverify()));
-  //  }
+  @override
+  void initState() {
+    super.initState();
+    aadharLogo = Image.asset("assets/images/aadharicon.png",);
+  }
+
+   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(aadharLogo.image, context);
+  }
 
   _getPincode(BuildContext context) async {
+    try {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission = await Geolocator.checkPermission();
-    
+
     if(!serviceEnabled){
       await Geolocator.openLocationSettings();
     }
@@ -89,7 +101,7 @@ class _PersonalInfo extends State<PersonalInfo> {
     Position geolocation = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
-
+     print(geolocation);
     List<Placemark> placemark = await placemarkFromCoordinates(geolocation.latitude, geolocation.longitude);
     Placemark place = placemark[0];
     
@@ -98,29 +110,39 @@ class _PersonalInfo extends State<PersonalInfo> {
       position = geolocation;
       pinController.text = "$pinCode";
     });
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false,elevation: 0, backgroundColor: Colors.white,),
     body: SingleChildScrollView(
         child: Container(
-          margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+          margin: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
              children: [
+                 Center(
+                child: SizedBox(
+                  height: 60,
+                  child: aadharLogo
+                  ),
+                ),
                 Container(
-                  margin: const EdgeInsets.only(bottom: 5),
-                  child: const Text("Personal Info", 
+                  alignment: Alignment.center,
+                  margin: const EdgeInsets.only(top: 10, bottom: 5),
+                  child: const Text(personalInfo, 
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 33
+                    fontSize: 30
                   ),
               ),
                 ),
               Container(
                 margin: const EdgeInsets.only(bottom: 15),
-                child: const Text("Fill in the details below to\nGet Started", 
+                child: const Text(fillBelow, 
                    textAlign: TextAlign.center,
                    style: TextStyle(
                      fontSize: 19,
@@ -139,7 +161,7 @@ class _PersonalInfo extends State<PersonalInfo> {
                            autovalidateMode: AutovalidateMode.onUserInteraction,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                              labelText: 'Name*',
+                              labelText: naMe,
                             ),
                             onChanged: (value){
                               setState(() {
@@ -163,7 +185,7 @@ class _PersonalInfo extends State<PersonalInfo> {
                         keyboardType: TextInputType.number,
                         controller: aadharController,
                         smartDashesType: SmartDashesType.enabled,
-                        maxLength: 16,
+                        maxLength: 12,
                         onChanged: (value) {
                           var sizeVal = value.length;
                           setState(() {
@@ -203,7 +225,7 @@ class _PersonalInfo extends State<PersonalInfo> {
                           items: const [
                             DropdownMenuItem(child: Text("Male"), value: "Male",),
                             DropdownMenuItem(child: Text("Female"), value: "Female",),
-                            DropdownMenuItem(child: Text("Other"), value: "Other",),
+                            DropdownMenuItem(child: Text("None"), value: "None",),
                           ],
                           onChanged: (c){
                             String genderType = c.toString();
@@ -256,7 +278,7 @@ class _PersonalInfo extends State<PersonalInfo> {
                           decoration: InputDecoration(
                             hintText: "Pincode",
                             border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                            labelText: "Pincode*",   
+                            labelText: "Pincode",   
                             enabled: true,
                             suffixIcon: IconButton( onPressed: ()=>_getPincode(context), icon: const Icon(Icons.gps_fixed,))  
                           ),
@@ -273,31 +295,26 @@ class _PersonalInfo extends State<PersonalInfo> {
                           if(name == "" || gender == "" || aadhar == "" || dob == 0  || pinController.text == ""){
                              return;
                           } else {
+                            if(formKey.currentState!.validate()){
                              formKey.currentState!.save();
                              final signature = await SmsAutoFill().getAppSignature;
                              context.read<Customer>().setPersonalInfo(
                                 nm: name.trim(),
-                                address: position!.toJson().toString(),
+                                // address: position!.toJson(),
                                 adh: aadhar,
                                 dateTime: selectedDate,
                                 gen: gender
                                );
                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const OTPverify(fromPage: "pinfo",)));
                             }
+                            }
                           },
                            style: ElevatedButton.styleFrom(
                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text("Verify and Submit", style: TextStyle(fontSize: 20),),
-                                SizedBox(width: 10,),
-                                Icon(Icons.arrow_forward_sharp)
-                              ],
-                            ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: Text("Verify and Submit", style: TextStyle(fontSize: 20),),
                           ) 
                      ),
                   ),

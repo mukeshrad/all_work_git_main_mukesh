@@ -1,4 +1,10 @@
+import 'dart:math';
+
+import 'package:finandy/modals/bill.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class UptrackCard extends StatefulWidget {
   final String ownerName;
@@ -6,13 +12,17 @@ class UptrackCard extends StatefulWidget {
   final String bankName;
   final String cardNumber;
   final String expiry;
+  final String cardNoTitle;
+  final String monthlyLimit;
   const UptrackCard({
     Key? key,
+    required this.monthlyLimit,
     required this.ownerName,
     required this.cardType,
     required this.bankName,
     required this.cardNumber,
     required this.expiry,
+    required this.cardNoTitle,
   }) : super(key: key);
 
   @override
@@ -20,18 +30,27 @@ class UptrackCard extends StatefulWidget {
 }
 
 class _UptrackCardState extends State<UptrackCard> {
-    
-    // late Image image1;
-    // late Image image2;
+  late SvgPicture logo;
+  late double outstandingAmount;
+  // late Image image2;
 
-    // @override
-    // void didChangeDependencies() {
-    //   precacheImage(image1.image, context);
-    //   precacheImage(image2.image, context);
-    //   super.didChangeDependencies();
-    // }
-  
-    buildTitleSection({title, subTitle}) {
+  @override
+  void initState() {
+    super.initState();
+    logo = SvgPicture.asset(
+      "assets/images/cardlogo.svg",
+    );
+    
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precachePicture(logo.pictureProvider, context);
+    //  outstandingAmount = Provider.of<BillSchema>(context).amount == Null ? 0 : (double.parse(widget.monthlyLimit)- Provider.of<BillSchema>(context).amount!.toDouble());
+  }
+
+  buildTitleSection({title, subTitle}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -57,85 +76,77 @@ class _UptrackCardState extends State<UptrackCard> {
   Card _buildCreditCard() {
     return Card(
       elevation: 5.0,
-      // color: color,
-      margin: const EdgeInsets.all(10),
+      // margin: const EdgeInsets.all(10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
       child: Container(
         height: 200,
         decoration: BoxDecoration(
-                  image:const DecorationImage(
-                    image: AssetImage("assets/images/map.png"),
-                    fit: BoxFit.cover,
-                    //  colorFilter: ColorFilter.mode(Colors.white, BlendMode.dstATop),
-                    opacity: 0.3
-                  ),
-                        borderRadius: BorderRadius.circular(20)
-                      ),
-        // padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 22.0, top: 10),
-        child: Container(
-          decoration:  BoxDecoration(
-              gradient: const LinearGradient(
-                        colors: [
-                          Colors.black38, 
-                          Colors.black87,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        stops: [0.5, 0.51],
-                        tileMode: TileMode.clamp
-                        ),
-              borderRadius: BorderRadius.circular(20)          
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.black87,
+        ),
+        child: Stack(children: [
+          Positioned(
+            right: 100,
+            top: -3,
+            child: Transform.rotate(
+              angle: pi / 4,
+              child: Container(
+                height: 210,
+                width: 130,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(color: Colors.black, width: 0.0),
+                  borderRadius:
+                      const BorderRadius.all(Radius.elliptical(200, 310)),
+                ),
+              ),
+            ),
           ),
-          child: Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               _buildLogosBlock(),
-              Padding(
-                padding: const EdgeInsets.only(top: 5.0, left: 7),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const Text("◀", 
-                       style: TextStyle(
-                         color: Colors.white,
-                       ),
-                    ),
-                    Image.asset("assets/images/chip.png")
-                  ],
-                )
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 25),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.cardNoTitle,
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 18, 
+                            right: 18,
+                            top: 5
+                           ),
+                         child: Text(widget.cardNumber.substring(0, 4)+" "+widget.cardNumber.substring(4, 8)+" "+ widget.cardNumber.substring(8, 12)+" "+widget.cardNumber.substring(12),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 24,
+                              wordSpacing: 10),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(
-                    left: 18, 
-                    right: 18,
-                    top: 20
-                   ),
-                 child: Text(widget.cardNumber,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 25,
-                      wordSpacing: 10
-                    ),
-                 ),
-                ),
-              _buildDetailsBlock(widget.expiry),
-              Padding(
-                padding: const EdgeInsets.only(left: 18.0),
-                child: Text(widget.ownerName.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      letterSpacing: 1.5
-                    ),
-                ),
-              )
             ],
           ),
-        ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: _buildDetailsBlock(widget.expiry),
+          )
+        ]),
       ),
     );
   }
@@ -143,74 +154,84 @@ class _UptrackCardState extends State<UptrackCard> {
   // Build the top row containing logos
   _buildLogosBlock() {
     return Container(
-      padding: const EdgeInsets.only(top: 18, left: 18, right: 18),
+      margin: const EdgeInsets.only(top: 18, left: 18, right: 18),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-         Text(widget.cardType.toUpperCase(), style: const TextStyle(
-           letterSpacing: 2,
-           color: Colors.white,
-           fontWeight: FontWeight.bold
-           ),
-         ),
-         Row(
-           children: [
-             Text(widget.bankName.toUpperCase(), 
-              style: const TextStyle(
+          Text(
+            widget.cardType,
+            style: const TextStyle(
                 letterSpacing: 2,
                 color: Colors.white,
-                fontWeight: FontWeight.bold
-               ),
-             ),
-             const SizedBox(width: 5,),
-             Image.asset(
-               "assets/images/wifi.png",
-                width: 10,
-                height: 10,
-                color: Colors.white,
-              ),
-           ],
-         )
+                fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 18,
+            width: 95,
+            child: logo,
+          )
         ],
       ),
     );
   }
 
- _buildDetailsBlock(String value) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0, right: 35),
+  _buildDetailsBlock(String value) {
+    return Container(
+      height: 55,
+      padding: const EdgeInsets.only(bottom: 15.0, left: 22, right: 22),
       child: Row(
-        // crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Column(
-            children: [
-              Text("Valid".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 8,
+            // mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:  [
+             const Padding(
+                padding: EdgeInsets.only(bottom: 2.0),
+                child: Text(
+                  "Total card limit",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 13,
+                  ),
                 ),
               ),
-              Text("Thru".toUpperCase(),
-                style: const TextStyle(
+              Text(
+                "₹ ${widget.monthlyLimit}",
+                style:const TextStyle(
                   color: Colors.white,
-                  fontSize: 8,
+                  fontSize: 16,
                 ),
               ),
             ],
           ),
-         const Text("▶", 
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-             ), 
-            ),
-          Text(value,
-           style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-             ),
-          )    
+          const VerticalDivider(
+            thickness: 1,
+            color: Colors.grey,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+             const Padding(
+                padding: EdgeInsets.only(bottom: 2.0),
+                child: Text(
+                  "Total Outstanding",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+              Text(
+                "₹ $outstandingAmount",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -218,6 +239,7 @@ class _UptrackCardState extends State<UptrackCard> {
 
   @override
   Widget build(BuildContext context) {
+    outstandingAmount = Provider.of<BillSchema>(context).amount == Null ? 0 : (double.parse(widget.monthlyLimit)- Provider.of<BillSchema>(context).amount);
     return Container(
       child: _buildCreditCard(),
     );

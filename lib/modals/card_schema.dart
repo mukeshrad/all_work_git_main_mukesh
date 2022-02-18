@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 class CreditCardLimits {
   int? daily;
-  int? yearly;
+  int? monthly;
   int? weekly;
-  CreditCardLimits(this.daily, this.weekly, this.yearly);
+  CreditCardLimits(this.daily, this.weekly, this.monthly);
 
   static CreditCardLimits? fromJson(Map<String, dynamic> json) {
    return CreditCardLimits(
       json['Daily'] as int?,
       json['Weekly'] as int?,
-      json['Yearly'] as int?,
+      json['Monthly'] as int?,
     );
   }
 }

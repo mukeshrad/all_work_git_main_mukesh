@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class NewAppBar extends StatelessWidget {
   final String pageName;
-  final Widget? prefix;
+  final Widget? sufix;
   const NewAppBar({
     Key? key,
     required this.pageName,
-    this.prefix,
+    this.sufix,
   }) : super(key: key);
 
   @override
@@ -33,7 +33,7 @@ class NewAppBar extends StatelessWidget {
             ),
           ],
         ),
-        prefix ?? Container(),
+        sufix ?? Container(),
       ],
     );
   }

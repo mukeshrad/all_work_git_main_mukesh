@@ -6,5 +6,6 @@ final transactionInstance = TransactionsApi(apiClient);
 
 final userApi = UsersApi(apiClient);
 
-CardsApi cardsApi = CardsApi(apiClient);
+final cardsApi = CardsApi(apiClient);
 
+final aadharVerificationApi = AadharVerificationApi(apiClient);

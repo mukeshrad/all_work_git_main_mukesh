@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:swagger/api.dart';
 
-enum UserState{
-
+enum UserState {
   FirstTime,
   PhoneEntered,
+  AadharVerified,
   OTPVerified,
   PermissionGiven,
   CardActivated,
@@ -39,52 +40,54 @@ class ProfessionalDetails {
     );
   }
 
-  Map<String, dynamic> toJson(instance) =>  <String, dynamic>{
-      'occupation_type': instance.occupationType,
-      'occupation': instance.occupation,
-      'monthly_income': instance.monthlyIncome,
-    };
+  Map<String, dynamic> toJson(instance) => <String, dynamic>{
+        'occupation_type': instance.occupationType,
+        'occupation': instance.occupation,
+        'monthly_income': instance.monthlyIncome,
+      };
 
   factory ProfessionalDetails.fromJson(json) => ProfessionalDetails(
-      occupationType: json['occupation_type'] as String?,
-      occupation: json['occupation'] as String?,
-      monthlyIncome: (json['monthly_income'] as num?)?.toDouble(),
-    );
+        occupationType: json['occupation_type'] as String?,
+        occupation: json['occupation'] as String?,
+        monthlyIncome: (json['monthly_income'] as num?)?.toDouble(),
+      );
 
   @override
-  String toString() => 'ProfessionalDetails(occupationType: $occupationType, occupation: $occupation, monthlyIncome: $monthlyIncome)';
+  String toString() =>
+      'ProfessionalDetails(occupationType: $occupationType, occupation: $occupation, monthlyIncome: $monthlyIncome)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is ProfessionalDetails &&
-      other.occupationType == occupationType &&
-      other.occupation == occupation &&
-      other.monthlyIncome == monthlyIncome;
+        other.occupationType == occupationType &&
+        other.occupation == occupation &&
+        other.monthlyIncome == monthlyIncome;
   }
 
   @override
-  int get hashCode => occupationType.hashCode ^ occupation.hashCode ^ monthlyIncome.hashCode;
+  int get hashCode =>
+      occupationType.hashCode ^ occupation.hashCode ^ monthlyIncome.hashCode;
 }
 
 class Customer with ChangeNotifier {
- String? primaryPhoneNumber = ""	;
- String? userId = "";
- String? customerName = "";
- String? clientId = "";
- String? clientCustomerId = "";
- String? email = "";
- String? currentAddress = "";
- Object? customerPreference;
- ProfessionalDetails? professionalInfo;
- Object? notificationPreference;
- bool? isVerified = false;
- List<UserState> doneStates = [];
- String? aadharNo = "";
- DateTime? dateOfBirth;
- String? gender;
- UserState? userState = UserState.FirstTime;
+  String? primaryPhoneNumber = "";
+  String? userId = "";
+  String? customerName = "";
+  String? clientId = "";
+  String? clientCustomerId = "";
+  String? email = "";
+  CurrentAddress? currentAddress;
+  Object? customerPreference;
+  ProfessionalInfo? professionalInfo;
+  NotificationPreference? notificationPreference;
+  bool? isVerified = false;
+  List<UserState> doneStates = [];
+  String? aadharNo = "";
+  DateTime? dateOfBirth;
+  String? gender;
+  UserState? userState = UserState.FirstTime;
 
   Customer({
     this.primaryPhoneNumber,
@@ -123,32 +126,36 @@ class Customer with ChangeNotifier {
     notifyListeners();
   }
 
- void setPersonalInfo({String? nm, DateTime? dateTime, String? gen, dynamic address, String? adh}){
+  void setPersonalInfo(
+      {String? nm,
+      DateTime? dateTime,
+      String? gen,
+      // dynamic address,
+      String? adh}) {
     aadharNo = adh;
     customerName = nm;
     gender = gen;
     dateOfBirth = dateTime;
-    currentAddress = address;
+    // currentAddress = address;
 
     notifyListeners();
- } 
+  }
 
   void setCustomer(json, UserState s) {
+    print('in it $json');
     primaryPhoneNumber = json['primary_phone_number'];
     customerName = json['customer_name'];
     clientId = json['client_id'];
-    userId = json['_id'];
-    clientCustomerId = json['id'];
+    userId = json['client_customer_id'];
+    clientCustomerId = json['client_customer_id'];
     email = json['email'];
     currentAddress = json['current_address'];
-    professionalInfo = json['professional_info'] == null
-          ? null
-          : ProfessionalDetails.fromJson(
-              json['professional_info'] as Map<String, dynamic>);
+    professionalInfo = json['professional_info'];
     gender = json['gender'];
-    dateOfBirth = json['dob'] == null ? null : DateTime.parse(json['dob'] as String);
+    dateOfBirth =
+        json['dob'] == null ? null : DateTime.parse(json['dob'] as String);
     customerPreference = json['customer_preference'];
-    notificationPreference = json['notification_preference'];          
+    notificationPreference = json['notification_preference'];
     isVerified = json['is_verified'];
     userState = s;
     notifyListeners();
@@ -181,35 +188,33 @@ class Customer with ChangeNotifier {
     if (identical(this, other)) return true;
 
     return other is Customer &&
-      other.primaryPhoneNumber == primaryPhoneNumber &&
-      other.userId == userId &&
-      other.customerName == customerName &&
-      other.clientId == clientId &&
-      other.clientCustomerId == clientCustomerId &&
-      other.email == email &&
-      other.currentAddress == currentAddress &&
-      other.professionalInfo == professionalInfo &&
-      other.customerPreference == customerPreference &&
-      other.dateOfBirth == dateOfBirth &&
-      other.gender == gender &&
-      other.isVerified == isVerified;
-
+        other.primaryPhoneNumber == primaryPhoneNumber &&
+        other.userId == userId &&
+        other.customerName == customerName &&
+        other.clientId == clientId &&
+        other.clientCustomerId == clientCustomerId &&
+        other.email == email &&
+        other.currentAddress == currentAddress &&
+        other.professionalInfo == professionalInfo &&
+        other.customerPreference == customerPreference &&
+        other.dateOfBirth == dateOfBirth &&
+        other.gender == gender &&
+        other.isVerified == isVerified;
   }
 
   @override
   int get hashCode {
     return primaryPhoneNumber.hashCode ^
-      userId.hashCode ^
-      customerName.hashCode ^
-      clientId.hashCode ^
-      clientCustomerId.hashCode ^
-      email.hashCode ^
-      currentAddress.hashCode ^
-      professionalInfo.hashCode ^
-      customerPreference.hashCode ^
-      gender.hashCode ^
-      dateOfBirth.hashCode ^
-      isVerified.hashCode;
-
+        userId.hashCode ^
+        customerName.hashCode ^
+        clientId.hashCode ^
+        clientCustomerId.hashCode ^
+        email.hashCode ^
+        currentAddress.hashCode ^
+        professionalInfo.hashCode ^
+        customerPreference.hashCode ^
+        gender.hashCode ^
+        dateOfBirth.hashCode ^
+        isVerified.hashCode;
   }
 }

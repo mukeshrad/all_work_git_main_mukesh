@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:finandy/constants/texts.dart';
 import 'package:finandy/modals/customer.dart';
 import 'package:finandy/screens/signin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/src/provider.dart';
 import 'package:uptrack/uptrack.dart';
 
@@ -14,85 +17,41 @@ class RequestPermissions extends StatefulWidget {
   _RequestPermissionsState createState() => _RequestPermissionsState();
 }
 
-class _RequestPermissionsState extends State<RequestPermissions> {
-  bool granted = false;
-
-    final splashDelay = 2;
+class _RequestPermissionsState extends State<RequestPermissions> {  
+  late SvgPicture logo;
 
   @override
   void initState() {
     super.initState();
-
-    // _loadWidget();
+    logo = SvgPicture.asset("assets/images/logo.svg",);
   }
 
-  showDeclinedModal(ctx){
-   return showDialog(
-            context: ctx,
-            builder: (BuildContext context) {
-              return Card(
-                elevation: 10,
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 150),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
-                      margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-                      child: const Text("We Require these permissions to provide you better services, please provide us the necessary permissions", 
-                         style: TextStyle(
-                           fontSize: 20
-                         ),
-                         ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.all(15),
-                      child: ElevatedButton(onPressed: (){
-                        context.read<Customer>().setUserState(UserState.PermissionGiven);
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const
-                          DataFetcher(nextPage: SignUpScreen())
-                       ));},
-                         style: ElevatedButton.styleFrom(
-                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(15.0),
-                          child: Text("Allow", style: TextStyle(fontSize: 20),),
-                        ) 
-                   ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
+    @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precachePicture(logo.pictureProvider, context);
   }
 
-
-  generateNote(IconData icon, String s) {
+  generateNote(IconData icon, String s, String des) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey,),
-        borderRadius: const BorderRadius.all(Radius.circular(5))
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xffd3d3d3), width: 0.5)),
+        // borderRadius: BorderRadius.all(Radius.circular(5))
       ),
       margin: const EdgeInsets.only(bottom: 5),
-      child: ListTile(
+      child: ExpansionTile(
+         children: [
+           Container(
+             margin: const EdgeInsets.only(left: 25, top: 5, bottom: 5, right: 5),
+             child: Text(des))
+           ],
          leading: Icon(icon),
-         title: Row(children: [
-          Text(s,
-           style: const TextStyle(
-             fontSize: 20,
-             fontWeight: FontWeight.w600
-           ),
+         title: Text(s,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600
           ),
-           const SizedBox(width: 5,),
-           GestureDetector(
-             child: const Icon(Icons.help),
-           ) 
-         ],)
+         ),
         ),
     );
   }
@@ -100,67 +59,72 @@ class _RequestPermissionsState extends State<RequestPermissions> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        title: const Text("Apps and Permissions"),  
-        ),
       body: SingleChildScrollView(
         child: Container(
           // alignment: Alignment.center,
-          margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          margin: const EdgeInsets.only(top: 25, bottom: 10, left: 10, right: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.only(top: 10, bottom: 8),
+                    child: const Text("Apps and Permissions",
+                      style: TextStyle(
+                        fontSize: 18
+                      ),
+                     )
+                    )
+                  ),
+              Center(
+                child: SizedBox(
+                  height: 35,
+                  width: 135,
+                  child: logo
+                  ),
+                ),
+               Center(
+                child: Container(
+                  padding: const EdgeInsets.only(top: 2, bottom: 8),
+                    child: const Text("needs access to",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w300
+                      ),
+                     )
+                    )
+                  ), 
               Column(
                 children: [
-                  generateNote(Icons.camera_alt_outlined, "Camera"),
-                  generateNote(Icons.location_on_outlined,"Location"),
-                  generateNote(Icons.perm_contact_cal_outlined, "Contacts"),
-                  generateNote(Icons.sms_outlined, "SMS"),
-                  generateNote(Icons.phone_iphone_outlined, "Device"),
-                  generateNote(Icons.storage_sharp, "Storage"),
+                  generateNote(Icons.camera_alt_outlined, "Camera", perDes[0]),
+                  generateNote(Icons.location_on_outlined,"Location", perDes[1]),
+                  generateNote(Icons.perm_contact_cal_outlined, "Contacts", perDes[2]),
+                  generateNote(Icons.sms_outlined, "SMS", perDes[3]),
+                  generateNote(Icons.phone_iphone_outlined, "Device", perDes[4]),
+                  generateNote(Icons.storage_sharp, "Storage", perDes[5]),
                   const SizedBox(height: 25,),
                 ],
               ),
               Container(
                 margin: const EdgeInsets.only(top: 25),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                      ElevatedButton(onPressed: (){
-                        context.read<Customer>().setUserState(UserState.PermissionGiven);
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const 
-                         DataFetcher(
-                           nextPage: 
-                           SignUpScreen()
-                            ,)
-                           ));}, 
-                        style: ElevatedButton.styleFrom(     
-                            padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 2), 
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: Text("Allow", style: TextStyle(fontSize: 20),),
-                        ) 
+                child: ElevatedButton(onPressed: (){
+                  context.read<Customer>().setUserState(UserState.PermissionGiven);
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const 
+                   DataFetcher(
+                     nextPage: 
+                     SignUpScreen()
+                      ,)
+                     ));}, 
+                  style: ElevatedButton.styleFrom(     
+                      padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 2), 
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Text("Allow", style: TextStyle(fontSize: 20),),
+                  ) 
                      ),
-                     const SizedBox(height: 10,),
-                     ElevatedButton(onPressed: (){showDeclinedModal(context);}, 
-                     style: ElevatedButton.styleFrom(
-                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 2),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        primary: Colors.grey
-                      ),
-                     child: const Padding(
-                       padding: EdgeInsets.all(12.0),
-                       child: 
-                           Text("Decline", style: TextStyle(fontSize: 20),),
-                      ) 
-                     ),
-                  ],
-                ),
               )  
             ],
           ),

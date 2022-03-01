@@ -92,7 +92,7 @@ class _AdressInfoState extends State<AdressInfo> {
         '${Provider.of<Customer>(context, listen: false).userId}',
         body: userBody);
     Provider.of<Customer>(context, listen: false)
-        .setCustomer(res2?.toJson(), UserState.OTPVerified);
+        .setCustomer(res2.toJson(), UserState.OTPVerified);
     print('${Provider.of<Customer>(context, listen: false).currentAddress}');
     print(res2);
   }

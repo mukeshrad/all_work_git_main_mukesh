@@ -76,7 +76,7 @@ class _OTPverifyState extends State<OTPverify> {
         
             SharedPreferences preferences = await SharedPreferences.getInstance();
             preferences.setString("userId", userId);
-            Provider.of<Customer>(context, listen: false).setCustomer(res2!.toJson(), UserState.AadharVerified);
+            Provider.of<Customer>(context, listen: false).setCustomer(res2.toJson(), UserState.AadharVerified);
             final response = await cardsApi.v1UsersUserIdCardsPost(userId);
             AadharGenerateOTPBody generateOTPBody = AadharGenerateOTPBody.fromJson({
                 'entered_name': res2.customerName,
@@ -122,27 +122,27 @@ class _OTPverifyState extends State<OTPverify> {
             "phone_number": Provider.of<Customer>(context, listen: false).primaryPhoneNumber
           });                  
           final res = await userApi.v1UsersSendOtpPost(body);
-          var code = res!.otp; 
+          var code = res.otp;
           final UsersOnboarduserBody onboarduserBody = UsersOnboarduserBody.fromJson({
             'client_id': clientId,
             'phone_number': Provider.of<Customer>(context, listen: false).primaryPhoneNumber,
             'otp': code,
           });
           final res1 = await userApi.v1UsersOnBoardUserPost(onboarduserBody);   
-          final token = res1!.token.toString();       
+          final token = res1.token.toString();
           final userId = res1.user.clientCustomerId; 
           final String name = res1.user.customerName.toString();
 
           SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
               sharedPreferences.setString("token", token);
-              sharedPreferences.setString("userId", userId);
+              sharedPreferences.setString("userId", userId!);
               apiClient.setAccessToken(token);   
               
             if(name != "null"){
               Provider.of<Customer>(context, listen: false).setCustomer(res1.user.toJson(), UserState.OTPVerified);
               final userDetails = await userApi.v1UsersUserDetailsGet(userId);
               
-              Provider.of<CardSchema>(context, listen: false).setCardDetails(json: userDetails!.cards![0].toJson(), name: Provider.of<Customer>(context, listen: false).customerName);
+              Provider.of<CardSchema>(context, listen: false).setCardDetails(json: userDetails.cards![0].toJson(), name: Provider.of<Customer>(context, listen: false).customerName);
               Provider.of<BillSchema>(context, listen: false).setBill(userDetails.bill!.toJson());
               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const RootPage()), (route) => false);   
           }else{

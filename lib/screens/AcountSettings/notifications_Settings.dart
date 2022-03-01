@@ -46,7 +46,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
         '${Provider.of<Customer>(context, listen: false).userId}',
         body: userBody);
     Provider.of<Customer>(context, listen: false)
-        .setCustomer(res2?.toJson(), UserState.OTPVerified);
+        .setCustomer(res2.toJson(), UserState.OTPVerified);
   }
 
   setData() async {

@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../constants/instances.dart';
 
 class NotificationListPage extends StatefulWidget {
   const NotificationListPage({Key? key}) : super(key: key);
@@ -16,23 +21,56 @@ class _NotificationList extends State<NotificationListPage> {
   void initState() {
     super.initState();
 
-    //:- Add TODO for actual API integration.
-    var item1 = NotificatioListModal();
-    item1.date = "10:30 AM";
-    item1.title = "Your Password have been successfully changed.";
-    item1.isNew = true;
-    notificationList.add(item1);
+    // //:- Add TODO for actual API integration.
+    // var item1 = NotificatioListModal();
+    // item1.date = "10:30 AM";
+    // item1.title = "Your Password have been successfully changed.";
+    // item1.isNew = true;
+    // notificationList.add(item1);
+    //
+    // //:- Add TODO for actual API integration.
+    // for (var i = 0; i < 6; i++) {
+    //   var item1 = NotificatioListModal();
+    //   item1.date = "10:30 AM";
+    //   item1.title = "You received Rs 1 in your Everyday Card";
+    //   item1.isNew = false;
+    //   notificationList.add(item1);
+    // }
+    // setState(() {});
 
-    //:- Add TODO for actual API integration.
-    for (var i = 0; i < 6; i++) {
-      var item1 = NotificatioListModal();
-      item1.date = "10:30 AM";
-      item1.title = "You received Rs 1 in your Everyday Card";
-      item1.isNew = false;
-      notificationList.add(item1);
-    }
-    setState(() {});
+    getUserDetails();
+
   }
+
+  var userId = "";
+  getUserDetails() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var id = preferences.get("userId");
+    print("user ID : $id");
+    setState(() {
+      userId = id.toString();
+    });
+    getNotification();
+  }
+  getNotification() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    Object? token = preferences.get("token");
+    apiClient.addDefaultHeader("Client-Secret", "");
+    apiClient.setAccessToken(token.toString());
+    print(token.toString());
+    try {
+      var response = await userApi
+          .v1UsersNotificationGet(userId);
+      print("result:${response.notifications}");
+
+      // notificationList =  response.notifications!.cast<NotificatioListModal>();
+      // print("resultnotificationList:$notificationList");
+    } catch (e) {
+      print(
+          "Exception when calling TransactionsApi->v1CardsCardIdTransactionsPost: $e\n");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {

@@ -71,7 +71,7 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
         body: userBody);
 
     Provider.of<Customer>(context, listen: false)
-        .setCustomer(res2?.toJson(), UserState.OTPVerified);
+        .setCustomer(res2.toJson(), UserState.OTPVerified);
     print('${Provider.of<Customer>(context, listen: false).currentAddress}');
     // print(res2?.email);
     print(res2);

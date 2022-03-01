@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
         final res = await userApi.v1UsersUserIdGet(userId.toString());
         final res1 = await cardsApi.v1UsersUserIdCardsPost(userId.toString());
         // print(res1.toString());
-        Provider.of<Customer>(context, listen: false).setCustomer(res!.toJson(), UserState.LoggedIn);
+        Provider.of<Customer>(context, listen: false).setCustomer(res.toJson(), UserState.LoggedIn);
         Provider.of<CardSchema>(context, listen: false).setCardDetails(json: res1!.toJson(), name: res.customerName);
         Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const RootPage()), (route) => false);
       } catch (e) {

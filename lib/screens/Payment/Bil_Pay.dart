@@ -1,6 +1,12 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:finandy/constants/Colors.dart';
+import 'package:finandy/constants/texts.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:swagger/api.dart';
 import 'package:universal_io/io.dart' as io;
 import 'package:finandy/screens/Upi%20Payment/src/api.dart';
 import 'package:finandy/screens/Upi%20Payment/src/discovery.dart';
@@ -10,7 +16,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
+
+import '../../constants/instances.dart';
+import '../../modals/require.dart';
+import '../scan_pay/qr_scan-enter-pin.dart';
 import 'Payment_Declined.dart';
 import 'Payment_Received.dart';
 
@@ -19,11 +30,17 @@ class PayInformation extends StatefulWidget {
   const PayInformation({Key? key,required this.isScreen}) : super(key: key);
 
 
+
+
+
+
   @override
   _PayInformationState createState() => _PayInformationState();
 }
 
 class _PayInformationState extends State<PayInformation> {
+
+
 
   var payInfoTypeScreen = "bilPay";
   String val = '';
@@ -37,16 +54,17 @@ class _PayInformationState extends State<PayInformation> {
 
   final txtEnterAmount = TextEditingController();
   var currentDate = "";
+  String price = "01.00";
+  String upi = "q53235427@ybl";
 
-
+  late Map SendData;
   Future<void> _onTap(ApplicationMeta app) async {
 
     //:- Add TODO for actual integration.
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
     // print("Starting transaction with id $transactionRef");
 
-    String price = "01.00";
-    String upi = "q53235427@ybl";
+
 
     final paymentResponce = await UpiPay.initiateTransaction(
       amount: price,
@@ -64,6 +82,8 @@ class _PayInformationState extends State<PayInformation> {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => PaymentDeclined()));
     } else if (paymentResponce.status == UpiTransactionStatus.success) {
+
+
       var now = DateTime.now();
       var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
       String getDate = formatter1.format(now);
@@ -78,6 +98,11 @@ class _PayInformationState extends State<PayInformation> {
       paymentDetails.date = getDate;
       paymentDetails.time = getTime;
       paymentDetails.location = "";
+
+      // setState(() {
+      //   SendData = paymentDetails as Map;
+      // });
+      // createTransaction(SendData);
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => PaymentReceived(
@@ -105,15 +130,7 @@ class _PayInformationState extends State<PayInformation> {
   @override
   void initState() {
     super.initState();
-    //
-    // MobileNumber.listenPhonePermission((isPermissionGranted) {
-    //   if (isPermissionGranted) {
-    //     initMobileNumberState();
-    //   } else {}
-    // });
-    //
-    // initMobileNumberState();
-
+    locationHandler(_getUserPosition);
     payInfoTypeScreen = widget.isScreen;
 
     // print("widget.isScreen : $payInfoTypeScreen");
@@ -127,39 +144,42 @@ class _PayInformationState extends State<PayInformation> {
       currentDate = getDate;
     });
 
+
+
     Future.delayed(Duration(milliseconds: 0), () async {
       _apps = (await UpiPay.getInstalledUpiApplications(
           statusType: UpiApplicationDiscoveryAppStatusType.all))
           .cast<ApplicationMeta>();
       setState(() {});
     });
+
+    getUserDetails();
   }
 
-// Platform messages are asynchronous, so we initialize in an async method.
-//   Future<void> initMobileNumberState() async {
-//     if (!await MobileNumber.hasPhonePermission) {
-//       await MobileNumber.requestPhonePermission;
-//       return;
-//     }
-//     String mobileNumber = '';
-//     // Platform messages may fail, so we use a try/catch PlatformException.
-//     try {
-//       mobileNumber = (await MobileNumber.mobileNumber)!;
-//       _simCard = (await MobileNumber.getSimCards)!;
-//     } on PlatformException catch (e) {
-//       debugPrint("Failed to get mobile number because of '${e.message}'");
-//     }
-//
-//     // If the widget was removed from the tree while the asynchronous platform
-//     // message was in flight, we want to discard the reply rather than calling
-//     // setState to update our non-existent appearance.
-//     if (!mounted) return;
-//
-//     setState(() {
-//       _mobileNumber = mobileNumber;
-//     });
-//   }
+  Position? position;
+  locationHandler(getLocation) {
+    Requires req = Requires();
+    req.checkStatus(req.location, getLocation);
+  }
 
+  void _getUserPosition() async {
+    Position userLocation = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      position = userLocation;
+    });
+  }
+
+  var userId = "";
+  getUserDetails() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var id = preferences.get("userId");
+    print("user ID : $id");
+    setState(() {
+      userId = id.toString();
+    });
+
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appWhiteColor,
@@ -984,6 +1004,7 @@ class _PayInformationState extends State<PayInformation> {
           });
         });
   }
+
 }
 
 class UpiPaymentResponse {

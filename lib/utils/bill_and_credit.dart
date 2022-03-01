@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/Payment/Bil_Pay.dart';
+
 class BillAndCreditSection extends StatefulWidget {
   const BillAndCreditSection({ Key? key }) : super(key: key);
 
@@ -88,7 +90,9 @@ class _BillAndCreditSectionState extends State<BillAndCreditSection> {
           const SizedBox(width: 7,),
           Expanded(
             child: GestureDetector(
-              onTap: (){},
+              onTap: (){  Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PayInformation(isScreen: "bilPay",)));
+              },
               child: elevatedContainer(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

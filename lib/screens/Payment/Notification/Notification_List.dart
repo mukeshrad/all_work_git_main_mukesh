@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:swagger/api.dart';
 
 import '../../../constants/instances.dart';
 
@@ -15,7 +16,7 @@ class NotificationListPage extends StatefulWidget {
 
 class _NotificationList extends State<NotificationListPage> {
 
-  List<NotificatioListModal> notificationList = [];
+  List<NotificationModel> notificationList = [];
 
   @override
   void initState() {
@@ -61,10 +62,13 @@ class _NotificationList extends State<NotificationListPage> {
     try {
       var response = await userApi
           .v1UsersNotificationGet(userId);
-      print("result:${response.notifications}");
+      print("result:${response.notifications![0].userId}");
+      setState(() {
+        notificationList =  response.notifications!;
+      });
 
-      // notificationList =  response.notifications!.cast<NotificatioListModal>();
-      // print("resultnotificationList:$notificationList");
+      print("resultNotification:${response.notifications}");
+
     } catch (e) {
       print(
           "Exception when calling TransactionsApi->v1CardsCardIdTransactionsPost: $e\n");
@@ -147,7 +151,7 @@ class _NotificationList extends State<NotificationListPage> {
                   margin: const EdgeInsets.only(top: 5),
 
                   decoration: BoxDecoration(
-                    color: item.isNew
+                    color: item.seen != null
                         ? Colors.red.withOpacity(1)
                         : Colors.grey.withOpacity(1),
                     shape: BoxShape.circle,
@@ -175,7 +179,7 @@ class _NotificationList extends State<NotificationListPage> {
                 ),
                 Container(
                   child: Text(
-                    item.date.toString(),
+                   '2022-02-16',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     softWrap: false,
@@ -200,8 +204,3 @@ class _NotificationList extends State<NotificationListPage> {
   }
 }
 
-class NotificatioListModal {
-  late String title;
-  late String date;
-  late bool isNew;
-}

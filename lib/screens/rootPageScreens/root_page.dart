@@ -159,10 +159,8 @@ class _RootPageState extends State<RootPage> {
             children: <Widget>[
               GestureDetector(
                 onTap: () {
-
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => PayInformation(isScreen: "quickPay",)));
-
                 },
                 child: Container(
                   padding: const EdgeInsets.all(5),

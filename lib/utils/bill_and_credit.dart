@@ -1,4 +1,5 @@
 import 'package:finandy/modals/bill.dart';
+import 'package:finandy/screens/Payment/Bil_Pay.dart';
 import 'package:finandy/screens/rootPageScreens/unbilled_transactions.dart';
 import 'package:finandy/utils/widget_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class _BillAndCreditSectionState extends State<BillAndCreditSection> {
   late SvgPicture calenderLogo; 
   late int billAmount;
   late int unbilledAmount;
+  late String dueDate;
 
   @override
   void initState() {
@@ -35,6 +37,7 @@ class _BillAndCreditSectionState extends State<BillAndCreditSection> {
   Widget build(BuildContext context) {
     unbilledAmount = Provider.of<BillSchema>(context, listen: false).amount.toInt();
     billAmount = Provider.of<BillSchema>(context, listen: false).amount.toInt();
+    dueDate = Provider.of<BillSchema>(context, listen: false).getDueDateFormatted().toString();
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
       child: Row(
@@ -123,25 +126,28 @@ class _BillAndCreditSectionState extends State<BillAndCreditSection> {
                             ),
                        ],
                       ),
-                      const SizedBox(height: 5,),
+                      SizedBox(height: billAmount == 0? 33 : 5,),
                       Padding(
                         padding: const EdgeInsets.only(left: 5.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
+                          billAmount == 0 ? Container() :  Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                              children: [
                                calenderLogo,
                                const SizedBox(width: 5,),
-                               const Text("Feb 10", 
-                                  style: TextStyle(
+                               Text(dueDate, 
+                                  style: const TextStyle(
                                     fontSize: 16
                                   ),),
                              ],
                             ),
-                          GestureDetector(
-                            onTap: () {},
+                         billAmount == 0 ? Container() : GestureDetector(
+                            onTap: () {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => const PayInformation(isScreen: "bilPay",)));
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal:  15, vertical: 5),
                               decoration: BoxDecoration(

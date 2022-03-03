@@ -52,9 +52,10 @@ class _LanguageSettingsState extends State<LanguageSettings> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: const Text("Hindi not Available"),
+      alignment: Alignment.center,
+      title: Center(child: const Text("Hindi not Available")),
       content: const Text(
-          "This feature is curently under development. Sorry for the inconveniences!"),
+          "This feature is curently under development.\nSorry for the inconveniences!"),
       actions: [
         okButton,
       ],
@@ -69,48 +70,61 @@ class _LanguageSettingsState extends State<LanguageSettings> {
     );
   }
 
-  Container buildTileWithRadio(
+  InkWell buildTileWithRadio(
       {required String tileName, required Language val}) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 15.0),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.grey.shade300,
+    return InkWell(
+      onTap: () {
+        if (tileName == 'Hindi') {
+          print('b');
+          showAlertDialog(context);
+        } else {
+          print('a');
+          setState(() {
+            _language = Language.English;
+          });
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 15.0),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey.shade300,
+          ),
+          borderRadius: BorderRadius.circular(5.0),
         ),
-        borderRadius: BorderRadius.circular(5.0),
-      ),
-      padding: EdgeInsets.only(
-        top: 6.0,
-        bottom: 6.0,
-        left: 18.0,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            tileName,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w500,
+        padding: const EdgeInsets.only(
+          top: 6.0,
+          bottom: 6.0,
+          left: 18.0,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              tileName,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          Radio<Language>(
-            activeColor: Color(0xffDD2E44),
-            value: val,
-            groupValue: _language,
-            onChanged: (value) {
-              if (value == Language.Hindi) {
-                print('b');
-                showAlertDialog(context);
-              } else {
-                print('a');
-                setState(() {
-                  _language = value!;
-                });
-              }
-            },
-          ),
-        ],
+            Radio<Language>(
+              activeColor: Color(0xffDD2E44),
+              value: val,
+              groupValue: _language,
+              onChanged: (value) {
+                if (value == Language.Hindi) {
+                  print('b');
+                  showAlertDialog(context);
+                } else {
+                  print('a');
+                  setState(() {
+                    _language = value!;
+                  });
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

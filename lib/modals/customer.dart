@@ -71,12 +71,71 @@ class ProfessionalDetails {
       occupationType.hashCode ^ occupation.hashCode ^ monthlyIncome.hashCode;
 }
 
+class FamilyDetails {
+  String? fatherName;
+  String? motherName;
+  int? noOfKids;
+  FamilyDetails({
+    this.fatherName,
+    this.motherName,
+    this.noOfKids,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'father_name': fatherName,
+      'mother_name': motherName,
+      'child_count': noOfKids,
+    };
+  }
+
+  factory FamilyDetails.fromMap(Map<String, dynamic> map) {
+    return FamilyDetails(
+      fatherName: map['fatherName'],
+      motherName: map['motherName'],
+      noOfKids: map['noOfKids']?.toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson(instance) => <String, dynamic>{
+        'father_name': instance.fatherName,
+        'mother_name': instance.motherName,
+        'child_count': instance.noOfKids,
+      };
+
+  factory FamilyDetails.fromJson(json) => FamilyDetails(
+        fatherName: json['father_name'] as String?,
+        motherName: json['mother_name'] as String?,
+        noOfKids: (json['child_count'] as num?)?.toInt(),
+      );
+
+  @override
+  String toString() =>
+      'FamilyDetails(fatherName: $fatherName, motherName: $motherName, noOfKids: $noOfKids)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is FamilyDetails &&
+        other.fatherName == fatherName &&
+        other.motherName == motherName &&
+        other.noOfKids == noOfKids;
+  }
+
+  @override
+  int get hashCode =>
+      fatherName.hashCode ^ motherName.hashCode ^ noOfKids.hashCode;
+}
+
 class Customer with ChangeNotifier {
   String? primaryPhoneNumber = "";
   String? userId = "";
   String? customerName = "";
   String? clientId = "";
-  String? clientCustomerId = "";
+  String? profileImage = "";
+  String? martialStatus = "";
+  FamilyInfo? familyDetails;
   String? email = "";
   CurrentAddress? currentAddress;
   Object? customerPreference;
@@ -88,13 +147,14 @@ class Customer with ChangeNotifier {
   DateTime? dateOfBirth;
   String? gender;
   UserState? userState = UserState.FirstTime;
+  String? upiId;
 
   Customer({
     this.primaryPhoneNumber,
+    this.upiId,
     this.userId,
     this.customerName,
     this.clientId,
-    this.clientCustomerId,
     this.email,
     this.currentAddress,
     this.professionalInfo,
@@ -104,6 +164,10 @@ class Customer with ChangeNotifier {
     this.dateOfBirth,
     this.gender,
     this.notificationPreference,
+    this.profileImage,
+    this.martialStatus,
+    this.aadharNo,
+    this.familyDetails,
   });
 
   void setPhone(String phone) {
@@ -141,23 +205,29 @@ class Customer with ChangeNotifier {
     notifyListeners();
   }
 
-  void setCustomer(json, UserState s) {
-    print('in it $json');
-    primaryPhoneNumber = json['primary_phone_number'];
-    customerName = json['customer_name'];
-    clientId = json['client_id'];
-    userId = json['client_customer_id'];
-    clientCustomerId = json['client_customer_id'];
-    email = json['email'];
-    currentAddress = json['current_address'];
-    professionalInfo = json['professional_info'];
-    gender = json['gender'];
-    dateOfBirth =
-        json['dob'] == null ? null : DateTime.parse(json['dob'] as String);
-    customerPreference = json['customer_preference'];
-    notificationPreference = json['notification_preference'];
-    isVerified = json['is_verified'];
-    userState = s;
+  void setCustomer(UserResponse user, UserState state) {
+    print('Setting user in context: $user');
+    primaryPhoneNumber = user.primaryPhoneNumber;
+    customerName = user.customerName;
+    clientId = user.clientId;
+    userId = user.id;
+    email = user.email;
+    currentAddress = user.currentAddress;
+    professionalInfo = user.professionalInfo;
+    gender = user.gender;
+    dateOfBirth = user.dob;
+    customerPreference = user.customerPreference;
+    notificationPreference = user.notificationPreference;
+    isVerified = user.isVerified;
+    userState = state;
+    profileImage = user.profileImage;
+    familyDetails = user.familyInfo;
+    upiId = user.rzpVpa;
+    notifyListeners();
+  }
+
+  void setProfilePhoto({required String imageLink}) {
+    profileImage = imageLink;
     notifyListeners();
   }
 
@@ -167,7 +237,6 @@ class Customer with ChangeNotifier {
       'userId': userId,
       'customerName': customerName,
       'clientId': clientId,
-      'clientCustomerId': clientCustomerId,
       'email': email,
       'currentAddress': currentAddress,
       'professionalDetails': professionalInfo,
@@ -180,7 +249,7 @@ class Customer with ChangeNotifier {
 
   @override
   String toString() {
-    return 'User(primaryPhoneNumber: $primaryPhoneNumber, userId: $userId, customerName: $customerName, clientId: $clientId, clientCustomerId: $clientCustomerId, email: $email, currentAddress: $currentAddress, professionalInfo: $professionalInfo, customerPreference: $customerPreference, gender: $gender, dob: $dateOfBirth, isVerified: $isVerified, notificationPreference: $notificationPreference)';
+    return 'User(primaryPhoneNumber: $primaryPhoneNumber, userId: $userId, customerName: $customerName, clientId: $clientId, email: $email, currentAddress: $currentAddress, professionalInfo: $professionalInfo, customerPreference: $customerPreference, gender: $gender, dob: $dateOfBirth, isVerified: $isVerified, notificationPreference: $notificationPreference)';
   }
 
   @override
@@ -192,7 +261,6 @@ class Customer with ChangeNotifier {
         other.userId == userId &&
         other.customerName == customerName &&
         other.clientId == clientId &&
-        other.clientCustomerId == clientCustomerId &&
         other.email == email &&
         other.currentAddress == currentAddress &&
         other.professionalInfo == professionalInfo &&
@@ -208,7 +276,6 @@ class Customer with ChangeNotifier {
         userId.hashCode ^
         customerName.hashCode ^
         clientId.hashCode ^
-        clientCustomerId.hashCode ^
         email.hashCode ^
         currentAddress.hashCode ^
         professionalInfo.hashCode ^

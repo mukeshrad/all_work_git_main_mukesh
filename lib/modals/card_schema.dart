@@ -1,35 +1,5 @@
 import 'package:flutter/material.dart';
-
-class CreditCardLimits {
-  int? daily;
-  int? monthly;
-  int? weekly;
-  CreditCardLimits(this.daily, this.weekly, this.monthly);
-
-  static CreditCardLimits? fromJson(Map<String, dynamic> json) {
-   return CreditCardLimits(
-      json['Daily'] as int?,
-      json['Weekly'] as int?,
-      json['Monthly'] as int?,
-    );
-  }
-}
-
-class CreditCardPreference {
-  bool? offlineEnabled;
-  bool? onlineEnabled;
-
-  CreditCardPreference(this.offlineEnabled, this.onlineEnabled);
-
-  static CreditCardPreference? fromJson(Map<String, dynamic> json) {
-    return CreditCardPreference(
-      json['offline_enabled'] as bool,
-      json['online_enabled'] as bool,
-    );
-  }
-
-
-}
+import 'package:swagger/api.dart';
 
 class CardSchema with ChangeNotifier {
   String? id;
@@ -39,19 +9,46 @@ class CardSchema with ChangeNotifier {
   String? cardNumber;
   String? expiry;
   DateTime? expiryDate;
+  String? userId;
+
+  String? accountId;
 
   String? currency;
 
-  CreditCardLimits? limits;
+  double? billAmount;
 
-  CreditCardPreference? preference;
+  DateTime? dueDate;
 
+  String? status;
+
+  String? type;
+
+  double? unbilledAmount;
+
+  bool? isPinSet;
+
+  CardLimits? limits;
+
+  CardPreference? preference;
   CardSchema({
+    this.id,
     this.ownerName,
     this.cardType,
     this.bankName,
     this.cardNumber,
     this.expiry,
+    this.expiryDate,
+    this.userId,
+    this.accountId,
+    this.currency,
+    this.billAmount,
+    this.dueDate,
+    this.status,
+    this.type,
+    this.unbilledAmount,
+    this.isPinSet,
+    this.limits,
+    this.preference,
   });
 
   getDateFormated(DateTime? t){
@@ -64,19 +61,28 @@ class CardSchema with ChangeNotifier {
     return fex;
   }
 
-  setCardDetails({json, String? name}){
-    // print(json.toString());
-    id = json["_id"];
-    ownerName = name;
-    expiryDate = DateTime?.parse(json['expiry_date'] as String);
-    limits = CreditCardLimits.fromJson(json['limits'] as Map<String, dynamic>);
-    cardType = "Uptrack Card";
+  setCardDetails(CardResponse card, [String? name]){
+    print('Setting Cards provider with ${card.toJson()}');
+    id = card.id;
+    accountId = card.accountId;
+    isPinSet = card.isPinSet;
+    ownerName = ownerName??name;
+    expiryDate = card.expiryDate;
+    limits = card.limits;
+    cardType = card.type;
+    // unbilledAmount = card.unbilledAmount;
+    // dueDate = card.d;
     bankName = "Bank Name";
     expiry = getDateFormated(expiryDate!);
-    cardNumber = json["card_number"];
-    currency = json["currency"];
-    preference = CreditCardPreference.fromJson(json['prefrence'] as Map<String, dynamic>);
+    cardNumber = card.cardNumber;
+    currency = card.currency;
+    preference = card.prefrence;
 
     notifyListeners();
+  }
+
+  @override
+  String toString() {
+    return 'CardSchema(id: $id, ownerName: $ownerName, cardType: $cardType, bankName: $bankName, cardNumber: $cardNumber, expiry: $expiry, expiryDate: $expiryDate, userId: $userId, accountId: $accountId, currency: $currency, billAmount: $billAmount, dueDate: $dueDate, status: $status, type: $type, unbilledAmount: $unbilledAmount, isPinSet: $isPinSet, limits: $limits, preference: $preference)';
   }
 }

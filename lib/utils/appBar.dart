@@ -22,7 +22,7 @@ class NewAppBar extends StatelessWidget {
                 },
                 icon: const Icon(Icons.arrow_back)),
             const SizedBox(
-              width: 30.0,
+              width: 10.0,
             ),
             Text(
               pageName,

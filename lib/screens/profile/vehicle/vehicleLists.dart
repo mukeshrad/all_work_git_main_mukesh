@@ -13,6 +13,12 @@ class VehicleList extends StatefulWidget {
 }
 
 class _VehicleListState extends State<VehicleList> {
+  // late Future<List<GoldenTicketResponse>?> goldenTickets;
+  // Future<List<DocumentResponse>?> getGoldenTicket() async {
+  //   return await goldenTicketApi.v1userGoldenTicketGet(
+  //       '${Provider.of<Customer>(context, listen: false).clientCustomerId}') ??
+  //       List.empty();
+  // }
   sendToscreen(var page) {
     Navigator.push(
       context,

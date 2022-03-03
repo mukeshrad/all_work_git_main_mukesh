@@ -1,8 +1,9 @@
 import 'package:finandy/constants/texts.dart';
-import 'package:finandy/modals/bill.dart';
 import 'package:finandy/modals/card_schema.dart';
+import 'package:finandy/screens/Payment/Bil_Pay.dart';
 import 'package:finandy/screens/card_settings/CardSettingsHomeScreen.dart';
 import 'package:finandy/screens/scan_pay/qr_scan.dart';
+import 'package:finandy/screens/set_card_pin.dart';
 import 'package:finandy/utils/bill_and_credit.dart';
 import 'package:finandy/utils/credit_card.dart';
 import 'package:finandy/utils/expenses_card.dart';
@@ -13,8 +14,10 @@ import 'package:finandy/utils/widget_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
 import '../Payment/Bil_Pay.dart';
 import '../Quiz Flow/HomePageQuizFlow.dart';
+
 class RootPage extends StatefulWidget {
   static String id = "root";
   const RootPage({Key? key}) : super(key: key);
@@ -136,6 +139,8 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isPinSet = context.watch<CardSchema>().isPinSet ?? false;
+    print(context.watch<CardSchema>().isPinSet);
     return Scaffold(
       appBar: MainAppBar(
         appBar: AppBar(),
@@ -143,158 +148,182 @@ class _RootPageState extends State<RootPage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
-        child: const Icon(Icons.qr_code_scanner_sharp),
+        child: Icon(isPinSet ? Icons.qr_code_scanner_sharp : Icons.lock),
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => CustomSizeScannerPage()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      isPinSet ? QrScanPage() : const CardActivation()));
         },
       ),
       drawer: const NavDrawer(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
           child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              GestureDetector(
-                onTap: () {
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {
+              if (isPinSet){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PayInformation(isScreen: "quickPay",)));
 
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => PayInformation(isScreen: "quickPay",)));
-
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(5),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [quickPayicon, const  Text(quickPay)],
-                  ),
-                ),
+              }else{
+                return;
+              }
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const PayInformation(isScreen: "quickPay")));
+            },
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [quickPayicon, const Text(quickPay)],
               ),
-              // if (centerLocations.contains(fabLocation)) const Spacer(),
-              Container(
-                  margin: const EdgeInsets.only(left: 20, bottom: 5),
-                  child: const Text(
-                    scanAndPay,
-                    textAlign: TextAlign.center,
-                  )),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => CSHomepage()));
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(5),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: const[
-                       Icon(Icons.credit_card_rounded),
-                      Text(cardSettings)
-                    ],
-                  ),
-                ),
+            ),
+          ),
+          // if (centerLocations.contains(fabLocation)) const Spacer(),
+          Container(
+              margin: const EdgeInsets.only(left: 20, bottom: 5),
+              child: const Text(
+                scanAndPay,
+                textAlign: TextAlign.center,
+              )),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CSHomepage()));
+            },
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: const [
+                  Icon(Icons.credit_card_rounded),
+                  Text(cardSettings)
+                ],
               ),
-            ],
-          )),
+            ),
+          ),
+        ],
+      )),
       body: ListView(
-
         children: [
           Container(
-            margin: const EdgeInsets.only(left: 12, right: 12, bottom: 5),
-            child:
-            UptrackCard(bankName: "${Provider.of<CardSchema>(context, listen: false).bankName}", cardNumber: "${Provider.of<CardSchema>(context, listen: false).cardNumber}", cardType: "${Provider.of<CardSchema>(context, listen: false).cardType}", expiry: "${Provider.of<CardSchema>(context, listen: false).expiry}",ownerName: "${Provider.of<CardSchema>(context, listen: false).ownerName}", cardNoTitle: "Card Number", monthlyLimit: "${Provider.of<CardSchema>(context, listen: false).limits!.monthly}")),
-        const ExpensesCard(),
-         Container(
+              margin: const EdgeInsets.only(left: 12, right: 12, bottom: 5),
+              child: UptrackCard(
+                  bankName:
+                      "${Provider.of<CardSchema>(context, listen: false).bankName}",
+                  cardNumber:
+                      "${Provider.of<CardSchema>(context, listen: false).cardNumber}",
+                  cardType:
+                      "${Provider.of<CardSchema>(context, listen: false).cardType}",
+                  expiry:
+                      "${Provider.of<CardSchema>(context, listen: false).expiry}",
+                  ownerName:
+                      "${Provider.of<CardSchema>(context, listen: false).ownerName}",
+                  cardNoTitle: "Card Number",
+                  monthlyLimit:
+                      "${Provider.of<CardSchema>(context, listen: false).limits!.monthly}")),
+          const ExpensesCard(),
+          Container(
             margin: const EdgeInsets.symmetric(horizontal: 15),
             child: elevatedContainer(
-             child: Container(
-               margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
-               child: Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                 children: [
-                  SizedBox(
-                    child: bulbIcon,
-                    width: 30,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      child: bulbIcon,
+                      width: 30,
                     ),
-                  const Text(completeProfile,
-                    softWrap: true,
-                    style: TextStyle(
-                      fontSize: 14
+                    const Text(
+                      completeProfile,
+                      softWrap: true,
+                      style: TextStyle(fontSize: 14),
                     ),
-                  ),
-                   GestureDetector(
-                     onTap: () {
-                     },
-                     child: Container(
-                       padding: const EdgeInsets.all(8),
-                       decoration: BoxDecoration(
-                         color: Theme.of(context).primaryColor,
-                         borderRadius: const BorderRadius.all(Radius.circular(5)),
-                       ),
-                       child: const Text(knowMore, style: TextStyle(fontSize: 13, color: Colors.white),))
-                       )
-               ],),
-             ),
+                    GestureDetector(
+                        onTap: () {},
+                        child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5)),
+                            ),
+                            child: const Text(
+                              knowMore,
+                              style:
+                                  TextStyle(fontSize: 13, color: Colors.white),
+                            )))
+                  ],
+                ),
+              ),
             ),
           ),
           const BillAndCreditSection(),
           const RewardsAndOffers(),
           Container(
-              padding: const EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 10),
-              child:elevatedContainer(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
-              child: Column(
+            padding:
+                const EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 10),
+            child: elevatedContainer(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 10, left: 10, right: 10, bottom: 10),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                      onTap: (){},
-                      child: const Text( instantCashback,
+                      onTap: () {},
+                      child: const Text(
+                        instantCashback,
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20
-                        ),
+                            fontWeight: FontWeight.bold, fontSize: 20),
                       ),
-                    ),const SizedBox(height: 5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                          child: Container(
-                            //  padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  cashback,
-                                  maxLines: 3,
-                                  style: TextStyle(
-                                     fontSize: 14
-                                ),
-                                ),const SizedBox(
-                                  height: 10,
-                                ),
-                                ElevatedButton(
-                                  onPressed: bottomModalSheet,
-                                  child: const Text(play),
-                                )
-                              ],
-                            ),
-                          )
-                         ),
-                         Expanded(child: Image.asset(
-                            "assets/images/cashback.gif",))
-                          ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                            child: Container(
+                          //  padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                cashback,
+                                maxLines: 3,
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              ElevatedButton(
+                                onPressed: bottomModalSheet,
+                                child: const Text(play),
+                              )
+                            ],
+                          ),
+                        )),
+                        Expanded(
+                            child: Image.asset(
+                          "assets/images/cashback.gif",
+                        ))
+                      ],
                     )
                   ],
                 ),
+              ),
             ),
-          ),
           ),
           Container(
             margin: EdgeInsets.only(left: 20,right: 20,top: 0),
@@ -309,7 +338,7 @@ class _RootPageState extends State<RootPage> {
 
           SizedBox(
             height: 30,
-          )
+          ),
         ],
       ),
     );

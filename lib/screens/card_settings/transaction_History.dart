@@ -1,9 +1,9 @@
 import 'package:finandy/constants/instances.dart';
-import 'package:finandy/modals/customer.dart';
+import 'package:finandy/modals/card_schema.dart';
 import 'package:finandy/utils/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:swagger/api.dart';
 
 class TransactionHistory extends StatefulWidget {
   const TransactionHistory({Key? key}) : super(key: key);
@@ -13,34 +13,51 @@ class TransactionHistory extends StatefulWidget {
 }
 
 class _TransactionHistoryState extends State<TransactionHistory> {
-  getData() async {
+  List<TransactionHistoryTile> _list = [];
+
+  Future getData() async {
+    print('Transaction history Screen');
     try {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      Object? token = preferences.get("token");
-      apiClient.setAccessToken(token as String);
-      print(
-          '${Provider.of<Customer>(context, listen: false).clientCustomerId}');
-      var r = await cardsApi.v1UsersUserIdCardsGet(
-          Provider.of<Customer>(context, listen: false).clientCustomerId!);
-      var cardId = r?.id;
-      print('is it $cardId');
-      var ru = await transactionInstance.v1CardsCardIdTransactionsGet(cardId!);
-      print(ru!.length);
+      String cardId = Provider.of<CardSchema>(context, listen: false).id!;
+      print('Card ID: $cardId');
+      UserTransactionList transactionList = await transactionApi.v1CardsCardIdTransactionsGet(cardId);
+      print('result is $transactionList');
+      for (int i = 0; i < transactionList.transactions.length; i++) {
+        UserTransaction transaction = transactionList.transactions[i];
+        _list.add(
+          TransactionHistoryTile(
+            amount: transaction.amount.toString(),
+            transactionId: transaction.id,
+            callback: () {
+              // getData();
+              buildShowModalBottomSheet(
+                context: context,
+                personName: transaction.merchantCategoryCode.toString(),
+                transactionId: transaction.id,
+                amount: transaction.amount.toString(),
+                date: transaction.paymentCompletionTime.toString(),
+                time: transaction.paymentCompletionTime.toString(),
+                location: 'Gurugram',
+              );
+            },
+            personName: 'Shri Ram Dhaba',
+          ),
+        );
+      }
       //     .setCustomer(r?.toJson(), UserState.LoggedIn);
       // print(
       //     'we have ${Provider.of<Customer>(context, listen: false).customerName}');
 
-      // final data = result;
+      // final data = result;*/
     } catch (e) {
-      print("Exception when calling CardApi->v1UsersUserIdCardsGet: $e\n");
+      print("Exception when calling CardApi->v1CardsCardIdTransactionsGet: $e\n");
     }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     getData();
+    super.initState();
   }
 
   @override
@@ -56,28 +73,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               SizedBox(
                 height: 29.0,
               ),
-              Expanded(
-                  child: ListView(
-                children: [
-                  TransactionHistoryTile(
-                    amount: '-4000',
-                    transactionId: '2321889w',
-                    callback: () {
-                      getData();
-                      buildShowModalBottomSheet(
-                        context: context,
-                        personName: 'Shri Ram Dhaba',
-                        transactionId: '2321889w',
-                        amount: 'Rs. 4000',
-                        date: '01/12/2022',
-                        time: '11:30 AM',
-                        location: 'Gurugram',
-                      );
-                    },
-                    personName: 'Shri Ram Dhaba',
-                  ),
-                ],
-              )),
+              Expanded(child: ListView(children: _list)),
             ],
           ),
         ),

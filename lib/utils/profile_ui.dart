@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../modals/customer.dart';
 
 class ProfileUi extends StatelessWidget {
   const ProfileUi(
@@ -14,6 +17,12 @@ class ProfileUi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    String? profileImage =
+        Provider.of<Customer>(context, listen: false).profileImage;
+    String initials() {
+      return ((name.isNotEmpty == true ? name[0] : "")).toUpperCase();
+    }
+
     return Stack(
       clipBehavior: Clip.none,
       alignment: Alignment.center,
@@ -37,10 +46,10 @@ class ProfileUi extends StatelessWidget {
             ],
             // border: Border.all(color: Colors.grey),
           ),
+          alignment: Alignment.bottomCenter,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(),
               Column(
                 children: [
                   Text(
@@ -52,17 +61,18 @@ class ProfileUi extends StatelessWidget {
                       fontSize: 20.0,
                     ),
                   ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  Container(
-                    child: Text(
-                      id,
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
+                  // THis below text is for upi id.
+                  // const SizedBox(
+                  //   height: 2,
+                  // ),
+                  // Container(
+                  //   child: Text(
+                  //     id,
+                  //     style: TextStyle(
+                  //       color: Colors.white,
+                  //     ),
+                  //   ),
+                  // )
                 ],
               )
             ],
@@ -75,29 +85,31 @@ class ProfileUi extends StatelessWidget {
             child: Stack(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHw%3D&w=1000&q=80'),
-                  // radius: ,
-                  maxRadius: 55,
+                  backgroundColor: Colors.blueGrey,
+                  backgroundImage: profileImage != null
+                      ? NetworkImage(profileImage)
+                      : null, // radius: ,
+                  radius: 55,
+                  child: profileImage == null ? Text(initials()) : null,
                 ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    alignment: Alignment.topLeft,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey, width: 0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.camera_enhance,
-                      color: Colors.black87,
-                      size: 18,
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   right: 0,
+                //   bottom: 0,
+                //   child: Container(
+                //     padding: const EdgeInsets.all(5),
+                //     alignment: Alignment.topLeft,
+                //     decoration: BoxDecoration(
+                //       color: Colors.white,
+                //       border: Border.all(color: Colors.grey, width: 0.5),
+                //       shape: BoxShape.circle,
+                //     ),
+                //     child: const Icon(
+                //       Icons.camera_enhance,
+                //       color: Colors.black87,
+                //       size: 18,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

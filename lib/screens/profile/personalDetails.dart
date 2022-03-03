@@ -1,23 +1,34 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:finandy/modals/customer.dart';
 import 'package:finandy/screens/profile/profile.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:swagger/api.dart';
+
+import '../../constants/constants.dart';
+import '../../constants/instances.dart';
+import '../../utils/usedButton.dart';
 
 class PersonalDetails extends StatefulWidget {
-  const PersonalDetails({Key? key}) : super(key: key);
+  final double profileProgressint;
+  const PersonalDetails({Key? key, required this.profileProgressint})
+      : super(key: key);
 
   @override
   _PersonalDetailsState createState() => _PersonalDetailsState();
 }
 
 class _PersonalDetailsState extends State<PersonalDetails> {
-  // TODO Configure API key authorization: clientSecretKeyAuth
-// swagger.api.Configuration.apiKey{'Client-Secret'} = 'YOUR_API_KEY';
-// // uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// swagger.api.Configuration.apiKeyPrefix{'Client-Secret'} = "Bearer";
-
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController martialStatusController = TextEditingController();
@@ -28,7 +39,18 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   TextEditingController fatherNameController = TextEditingController();
   TextEditingController motherNameController = TextEditingController();
   TextEditingController noOfKidsController = TextEditingController();
-
+  bool _saving = false;
+  bool enableEmailEditing = false;
+  bool enableKidsEditing = false;
+  bool enableMotherEditing = false;
+  bool enableFatherEditing = false;
+  bool change = false;
+  bool startUpdate = false;
+  File? file;
+  bool showUpdateButton = false;
+  final List<String> martialStatusList = ['Select', 'Married', 'Single'];
+  String? initialMartialStatus = 'Select';
+  bool isMartialEdit = false;
   sendToscreen(var page) {
     Navigator.push(
       context,
@@ -36,43 +58,191 @@ class _PersonalDetailsState extends State<PersonalDetails> {
     );
   }
 
-  // UserResponse? result;
-  bool change = false;
+  late FocusNode emailFocusNode;
+  late FocusNode noOfKidsFocusNode;
+  late FocusNode motherFocusNode;
+  late FocusNode fatherFocusNode;
+  void showKeyboard(FocusNode focusNode) {
+    focusNode.requestFocus();
+  }
 
-  // getdet() async {
-  //   // String | User Id
-  //
-  //   try {
-  //     // var result = await api_instance.v1UsersOnBoardUserPost(body,
-  //     //     clientSecret: '257b1e871085b3433674d416fa743668');
-  //     // defaultApiClient.addDefaultHeader("Client-Secret", "");
-  //     apiClient.setAccessToken(
-  //         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOiI2MWRkNDY4YjVlMzQ2YzAwMWQyNDAzN2YiLCJjcmVhdGVkQXQiOiIyMDIyLTAxLTE2VDA2OjE0OjQ5LjU1N1oifSwiaWF0IjoxNjQyMzEzNjg5fQ.Ro4PhbIa4d52inJs9K7osJtmZT7PQj5BjW6TiRMybzI');
-  //     var r = await api_instance.v1UsersUserIdGet('61dd468b5e346c001d24037f');
-  //     print('as $r');
-  //     setState(() {
-  //       result = r;
-  //       // customerName = r?.customerName ?? 'null';
-  //       // id = r?.id ?? 'null';
-  //       // primaryPhoneNumber = r?.primaryPhoneNumber ?? 'null';
-  //       // email = r?.email ?? 'null';
-  //     });
-  //     // Provider.of<Customer>(context, listen: false)
-  //     //     .setCustomer(r?.toJson(), UserState.LoggedIn);
-  //     // print(
-  //     //     'we have ${Provider.of<Customer>(context, listen: false).customerName}');
-  //     print(result);
-  //     // final data = result;
-  //   } catch (e) {
-  //     print("Exception when calling UsersApi->v1UsersUserIdGet: $e\n");
-  //   }
-  // }
+  Future getImagefromGallery({required ImageSource imageSource}) async {
+    try {
+      var image = await ImagePicker().pickImage(source: imageSource);
+
+      if (image != null) {
+        setState(() {
+          final File? file = File(image.path);
+          print('asdfsd');
+          print(file!.path);
+          print(file);
+        });
+        setState(() {
+          _saving = true;
+        });
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        Object? token = preferences.get("token");
+        var data = await putImage(path: image.path, token: '$token');
+        if (data != null) {
+          var json = jsonDecode(data);
+          Provider.of<Customer>(context, listen: false)
+              .setProfilePhoto(imageLink: json['data']['profile_image']);
+          print(json['data']['profile_image']);
+        }
+      } else {}
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+  }
+
+  Future<String?> putImage({
+    required String token,
+    required String path,
+  }) async {
+    // TODO: Move this to dart client
+    var headers = {
+      'Authorization': 'Bearer $token',
+    };
+    var request = http.MultipartRequest(
+        'PUT',
+        Uri.parse(
+            'https://devo.resilient-ai.com/v1/users/${Provider.of<Customer>(context, listen: false).userId}/upload'));
+    request.files.add(await http.MultipartFile.fromPath('profile_image', path));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      setState(() {
+        _saving = false;
+      });
+      Fluttertoast.showToast(
+          msg: "Profile Photo Updated Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: const Color(0xff084E6C),
+          textColor: Colors.white,
+          fontSize: 16.0);
+      return result;
+    } else {
+      Fluttertoast.showToast(
+        msg: '${response.reasonPhrase}',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: const Color(0xff084E6C),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return null;
+    }
+  }
+
+  putData(
+      {required bool martialStatus,
+      required bool noOfKids,
+      required bool email}) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    Object? token = preferences.get("token");
+    apiClient.setAccessToken(token as String);
+    UsersUserIdPutBody userBody = UsersUserIdPutBody.fromJson({
+      // "id": Provider.of<Customer>(context, listen: false).clientCustomerId,
+      'email': emailController.text,
+      'family_info': {
+        // 'father_name': 'harhs l',
+        // 'mother_name': 'sdfsdf',
+        'child_count': 12,
+      }
+    });
+
+    final res2 = await userApi.v1UsersUserIdPut(
+        '${Provider.of<Customer>(context, listen: false).userId}',
+        body: userBody);
+
+    Provider.of<Customer>(context, listen: false)
+        .setCustomer(res2, UserState.OTPVerified);
+  }
+
+  showAlertDialog(BuildContext context) {
+    // set up the button
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      alignment: Alignment.center,
+      content: Container(
+        height: 120,
+        width: double.maxFinite,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo),
+                title: Text(
+                  'Choose from Gallery',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  getImagefromGallery(imageSource: ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.camera),
+                title: Text(
+                  'Take from Camera',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  getImagefromGallery(imageSource: ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  showPickImageDialouge() {
+    return AlertDialog(
+      title: Text('sfdsd'),
+      content: Column(
+        children: [
+          TextButton(
+            onPressed: () {
+              getImagefromGallery(imageSource: ImageSource.gallery);
+            },
+            child: const Text('Choose from Gallery'),
+          ),
+          TextButton(
+            onPressed: () {
+              getImagefromGallery(imageSource: ImageSource.camera);
+            },
+            child: const Text('Take from Camera'),
+          ),
+        ],
+      ),
+    );
+  }
 
   setData() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    print(preferences.getString('userId'));
-    print(Provider.of<Customer>(context, listen: false).email);
     setState(
       () {
         nameController.text =
@@ -106,8 +276,24 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    emailFocusNode.dispose();
+    noOfKidsFocusNode.dispose();
+    motherFocusNode.dispose();
+    fatherFocusNode.dispose();
+  }
+
+  @override
   void initState() {
-    // TODO: implement initState
+    if (mounted) {
+      setState(() {
+        emailFocusNode = FocusNode();
+        noOfKidsFocusNode = FocusNode();
+        motherFocusNode = FocusNode();
+        fatherFocusNode = FocusNode();
+      });
+    }
     super.initState();
     setData();
   }
@@ -117,88 +303,221 @@ class _PersonalDetailsState extends State<PersonalDetails> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: ListView(
-          children: [
-            buildProfileTop(),
-            const SizedBox(
-              height: 78.0,
-            ),
-            buildName(context),
-            const SizedBox(
-              height: 10.0,
-            ),
-            buildProgressWidget(context),
-            const SizedBox(
-              height: 16.0,
-            ),
-            buildChoiceTile(
-              callback: changeDetails,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 40.0,
-                vertical: 20.0,
+        body: ModalProgressHUD(
+          inAsyncCall: _saving,
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  children: [
+                    GestureDetector(
+                      child: buildProfileTop(),
+                      onTap: () {
+                        print('asdfs');
+                        showAlertDialog(context);
+                      },
+                    ),
+                    const SizedBox(
+                      height: 78.0,
+                    ),
+                    buildName(context),
+                    const SizedBox(
+                      height: 10.0,
+                    ),
+                    buildProgressWidget(context),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    buildChoiceTile(
+                      callback: changeDetails,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40.0,
+                        vertical: 20.0,
+                      ),
+                      child: change
+                          ? familyDetailsFields()
+                          : profileDetailFields(),
+                    ),
+                  ],
+                ),
               ),
-              child: change
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        buildTitleName(
-                          title: "Father’s Name",
-                        ),
-                        buildTextField(
-                          controller: fatherNameController,
-                        ),
-                        const SizedBox(
-                          height: 16.5,
-                        ),
-                        buildTitleName(
-                          title: "Mother’s Name",
-                        ),
-                        buildTextField(
-                          controller: motherNameController,
-                        ),
-                        const SizedBox(
-                          height: 16.5,
-                        ),
-                        buildTitleName(
-                          title: 'No of Kids',
-                        ),
-                        buildTextField(
-                          controller: noOfKidsController,
-                          haveSufix: true,
-                          editButtonFunction: () {},
-                        ),
-                      ],
-                    )
-                  : profileFields(),
-            ),
-          ],
+              const SizedBox(
+                height: 10.0,
+              ),
+              showUpdateButton ? buildupdateButton() : Container(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Column profileFields() {
+  Padding buildupdateButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5.0),
+      child: UsedButton(
+        buttonName: startUpdate
+            ? circularProgressIndicator
+            : const Center(
+                child: Text(
+                  'Update',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.0),
+                ),
+              ),
+        onpressed: () {
+          updateProfileFieldData();
+        },
+      ),
+    );
+  }
+
+  updateProfileFieldData() async {
+    try {
+      setState(() {
+        startUpdate = true;
+      });
+
+      await putData(martialStatus: true, email: false, noOfKids: false);
+
+      setState(() {
+        startUpdate = false;
+        isMartialEdit = false;
+        showUpdateButton = false;
+      });
+      Fluttertoast.showToast(
+        msg: "Data Updated Successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: const Color(0xff084E6C),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Column familyDetailsFields() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         buildTitleName(
-          title: 'Aadhar Number',
+          title: "Father’s Name",
         ),
         buildTextField(
-          controller: adharController,
+          haveSufix: true,
+          enabled: true,
+          focusNode: fatherFocusNode,
+          editButtonFunction: () {
+            setState(() {
+              enableFatherEditing = true;
+              showKeyboard(fatherFocusNode);
+            });
+          },
+          controller: fatherNameController,
         ),
         const SizedBox(
           height: 16.5,
         ),
+        buildTitleName(
+          title: "Mother’s Name",
+        ),
+        buildTextField(
+          haveSufix: true,
+          enabled: true,
+          controller: motherNameController,
+          focusNode: motherFocusNode,
+          editButtonFunction: () {
+            setState(() {
+              enableMotherEditing = true;
+              showKeyboard(motherFocusNode);
+            });
+          },
+        ),
+        const SizedBox(
+          height: 16.5,
+        ),
+        buildTitleName(
+          title: 'No of Kids',
+        ),
+        buildTextField(
+          controller: noOfKidsController,
+          haveSufix: true,
+          enabled: true,
+          focusNode: noOfKidsFocusNode,
+          textInputType: TextInputType.number,
+          editButtonFunction: () {
+            setState(() {
+              enableKidsEditing = true;
+              showKeyboard(noOfKidsFocusNode);
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  DropdownButton dropDownButton({
+    required value,
+    required List<String> list,
+    required void Function(String? value)? onChanged,
+  }) {
+    return DropdownButton<String>(
+      icon: const Padding(
+        padding: EdgeInsets.only(right: 17.0),
+        child: Icon(
+          Icons.edit,
+          color: Color(0xff084E6C),
+        ),
+      ),
+      value: value,
+      style: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+        overflow: TextOverflow.ellipsis,
+        fontSize: 17.0,
+      ),
+      items: list.map((String s) {
+        return DropdownMenuItem<String>(
+          value: s,
+          child: Text(s),
+        );
+      }).toList(),
+      iconSize: 17.0,
+      onChanged: onChanged,
+      isExpanded: true,
+    );
+  }
+
+  Column profileDetailFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // buildTitleName(
+        //   title: 'Aadhar Number',
+        // ),
+        // buildTextField(
+        //   controller: adharController,
+        // ),
+
         buildTitleName(
           title: 'Email Id',
         ),
         buildTextField(
           controller: emailController,
           haveSufix: true,
-          editButtonFunction: () {},
+          enabled: true,
+          focusNode: emailFocusNode,
+          textInputType: TextInputType.emailAddress,
+          editButtonFunction: () {
+            setState(() {
+              enableEmailEditing = true;
+              showKeyboard(emailFocusNode);
+            });
+          },
         ),
         const SizedBox(
           height: 16.5,
@@ -224,20 +543,46 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         buildTitleName(
           title: 'Martial Status',
         ),
-        buildTextField(
-          controller: martialStatusController,
-        ),
+        dropDownButton(
+          value: initialMartialStatus,
+          list: martialStatusList,
+          onChanged: onStateDropDownChanged,
+        )
       ],
     );
   }
 
-  TextField buildTextField(
-      {required TextEditingController controller,
-      bool? haveSufix,
-      VoidCallback? editButtonFunction}) {
+  void onStateDropDownChanged(String? value) {
+    if (value != initialMartialStatus) {
+      setState(() {
+        initialMartialStatus = value;
+        isMartialEdit = true;
+        showUpdateButton = true;
+        print(value);
+        print(initialMartialStatus);
+      });
+    }
+  }
+
+  TextField buildTextField({
+    required TextEditingController controller,
+    bool? haveSufix,
+    bool? enabled,
+    FocusNode? focusNode,
+    VoidCallback? editButtonFunction,
+    TextInputType? textInputType,
+  }) {
     return TextField(
+      keyboardType: textInputType ?? TextInputType.none,
+      onChanged: (e) {
+        setState(() {
+          showUpdateButton = true;
+        });
+      },
+      focusNode: focusNode,
+      enabled: enabled ?? false,
       controller: controller,
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.w500,
         fontSize: 17.0,
       ),
@@ -245,10 +590,10 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         suffixIcon: haveSufix == true
             ? IconButton(
                 onPressed: editButtonFunction,
-                icon: Icon(
+                icon: const Icon(
                   Icons.edit,
                   color: Color(0xff084E6C),
-                  size: 15.0,
+                  size: 17.0,
                 ),
               )
             : null,
@@ -293,14 +638,16 @@ class _PersonalDetailsState extends State<PersonalDetails> {
               InkWell(
                 onTap: callback,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 30.0,
                     vertical: 16.0,
                   ),
                   child: Text(
                     "Personal Info",
                     style: TextStyle(
-                      color: change ? Color(0xff5C5C5C) : Color(0xffDD2E44),
+                      color: change
+                          ? const Color(0xff5C5C5C)
+                          : const Color(0xffDD2E44),
                       fontSize: 17.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -310,19 +657,21 @@ class _PersonalDetailsState extends State<PersonalDetails> {
               Container(
                 height: 15,
                 width: 2.0,
-                color: Color(0xffF2F2F2),
+                color: const Color(0xffF2F2F2),
               ),
               InkWell(
                 onTap: callback,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 30.0,
                     vertical: 16.0,
                   ),
                   child: Text(
                     "Family Details",
                     style: TextStyle(
-                      color: change ? Color(0xffDD2E44) : Color(0xff5C5C5C),
+                      color: change
+                          ? const Color(0xffDD2E44)
+                          : const Color(0xff5C5C5C),
                       fontSize: 17.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -350,7 +699,8 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         horizontal: 30.0,
       ),
       child: profileProgress(
-        progress: .45,
+        context: context,
+        progress: widget.profileProgressint,
         name: '${Provider.of<Customer>(context, listen: false).customerName}',
         upiId: 'harsh@icici',
         profileImg: '',
@@ -370,23 +720,30 @@ class _PersonalDetailsState extends State<PersonalDetails> {
             ),
           ),
         ),
-        const SizedBox(
-          height: 10.0,
-        ),
-        const Center(
-          child: Text(
-            'harsh@icici',
-            style: TextStyle(
-              color: Color(0xff5C5C5C),
-              fontSize: 17.0,
-            ),
-          ),
-        ),
+        // const SizedBox(
+        //   height: 10.0,
+        // ),
+        // const Center(
+        //   child: Text(
+        //     'harsh@icici',
+        //     style: TextStyle(
+        //       color: Color(0xff5C5C5C),
+        //       fontSize: 17.0,
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
 
   Stack buildProfileTop() {
+    String? profileImage =
+        Provider.of<Customer>(context, listen: false).profileImage;
+    String? name = Provider.of<Customer>(context, listen: false).customerName;
+    String initials() {
+      return ((name?.isNotEmpty == true ? name![0] : "")).toUpperCase();
+    }
+
     return Stack(
       clipBehavior: Clip.none,
       alignment: Alignment.center,
@@ -395,13 +752,13 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
                 vertical: 16.0,
               ),
               alignment: AlignmentDirectional.topStart,
               height: 122,
-              color: Color(0xff054561),
+              color: const Color(0xff054561),
               child: IconButton(
                 icon: const Icon(
                   Icons.arrow_back_outlined,
@@ -417,14 +774,17 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         Positioned(
           bottom: -66.0,
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(72.0),
                 ),
-                child: const CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHw%3D&w=1000&q=80'),
+                child: CircleAvatar(
+                  backgroundImage:
+                      profileImage != null ? NetworkImage(profileImage) : null,
+                  backgroundColor: Colors.grey,
+                  child: profileImage == null ? Text(initials()) : null,
                   // radius: ,
                   maxRadius: 70,
                 ),

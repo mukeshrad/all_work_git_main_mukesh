@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:finandy/constants/texts.dart';
 import 'package:finandy/modals/customer.dart';
 import 'package:finandy/screens/AcountSettings/account_settings.dart';
-import 'package:finandy/screens/Credit-Score/credit_Score.dart';
 import 'package:finandy/screens/Rate_AND_Review/ratingScreen.dart';
 import 'package:finandy/screens/app_purpose.dart';
 import 'package:finandy/screens/golden_ticket/golden_ticket.dart';
@@ -72,8 +71,9 @@ class _NavDrawerState extends State<NavDrawer> {
 
   _launchURL() async {
     const url = 'https://www.uptrack.money/privacy';
+    // const urle = 'https://www.cinesound.in';
     if (await canLaunch(url)) {
-      await launch(url);
+      await launch(url, forceWebView: true);
     } else {
       throw 'Could not launch $url';
     }
@@ -135,10 +135,11 @@ class _NavDrawerState extends State<NavDrawer> {
                         height: 30.0,
                       ),
                       ProfileUi(
-                          id: userId,
-                          name:
-                              '${Provider.of<Customer>(context, listen: false).customerName}',
-                          profileImg: userImg),
+                        id: 'userId',
+                        name:
+                            '${Provider.of<Customer>(context, listen: false).customerName}',
+                        profileImg: userImg,
+                      ),
                       const SizedBox(
                         height: 15,
                       ),
@@ -158,14 +159,14 @@ class _NavDrawerState extends State<NavDrawer> {
                           "Golden Ticket", () {
                         sendToscreen(const GoldenTicket(), context);
                       }),
-                      menuOption(
-                          const Icon(
-                            CupertinoIcons.speedometer,
-                            color: Color(0xff6FEF25),
-                          ),
-                          "Credit Score", () {
-                        sendToscreen(const CreditScore(), context);
-                      }),
+                      // menuOption(
+                      //     const Icon(
+                      //       CupertinoIcons.speedometer,
+                      //       color: Color(0xff6FEF25),
+                      //     ),
+                      //     "Credit Score", () {
+                      //   sendToscreen(const CreditScore(), context);
+                      // }),
                       menuOption(
                           const Icon(
                             Icons.settings_outlined,
@@ -189,7 +190,8 @@ class _NavDrawerState extends State<NavDrawer> {
                             color: Color(0xff72D837),
                           ),
                           "Rate and Review", () {
-                        sendToscreen(const RatingScreen(), context);
+                        sendToScreen(
+                            page: const RatingScreen(), buildContext: context);
                       }),
                       menuOption(
                           const Icon(
@@ -231,17 +233,17 @@ class _NavDrawerState extends State<NavDrawer> {
       padding: EdgeInsets.symmetric(
         vertical: 16.0,
       ),
-      decoration: BoxDecoration(
-        color: Color.fromRGBO(223, 31, 50, .2),
-        borderRadius: BorderRadius.circular(7.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade300,
-            offset: const Offset(0.0, 5.0),
-            blurRadius: 30.0,
-          ),
-        ],
-      ),
+      // decoration: BoxDecoration(
+      //   color: Color.fromRGBO(223, 31, 50, .2),
+      //   borderRadius: BorderRadius.circular(7.0),
+      //   boxShadow: [
+      //     BoxShadow(
+      //       color: Colors.grey.shade300,
+      //       offset: const Offset(0.0, 5.0),
+      //       blurRadius: 30.0,
+      //     ),
+      //   ],
+      // ),
       child: Center(
           child: Text(
         'Logout',

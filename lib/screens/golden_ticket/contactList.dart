@@ -18,7 +18,13 @@ class _ContactsPageState extends State<ContactsPage> {
     //Make sure we already have permissions for contacts when we get to this
     //page, so we can just retrieve it
     if (widget.contacts == null) {
-      final Iterable<Contact> contacts = await ContactsService.getContacts();
+      final Iterable<Contact> contacts = await ContactsService.getContacts(
+        withThumbnails: false,
+        photoHighResolution: false,
+        orderByGivenName: false,
+        iOSLocalizedLabels: false,
+        androidLocalizedLabels: false,
+      );
       setState(() {
         _contacts = contacts;
       });
@@ -38,7 +44,7 @@ class _ContactsPageState extends State<ContactsPage> {
     print(enteredKeyword);
     Iterable<Contact>? results = [];
     if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
+      // if the s earch field is empty or only contains white-space, we'll display all users
       results = _contacts;
     } else {
       results = _contacts?.where((user) {

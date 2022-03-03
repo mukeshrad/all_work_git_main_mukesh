@@ -7,6 +7,7 @@ class Requires {
   Permission location = Permission.location;
   Permission contacts = Permission.contacts;
   Permission sensors = Permission.sensors;
+  Permission storage = Permission.storage;
    
   checkStatus(Permission target, func) async{
     PermissionStatus _permissionStatus = await target.status;
@@ -25,5 +26,20 @@ class Requires {
     }
   }
 
+  Future<bool> checkGranted() async{
+    Map<Permission, PermissionStatus> statuses = await [
+        Permission.location,
+        Permission.storage,
+        Permission.camera,
+        Permission.contacts,
+        Permission.sms,
+      ].request();
+
+      for(var v in statuses.keys){
+        print("${PermissionStatus.granted} ${statuses[v]} $v");
+        if(statuses[v] != PermissionStatus.granted) return false; 
+      }
+      return true;
+  }
   
 }

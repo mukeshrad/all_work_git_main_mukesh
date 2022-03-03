@@ -1,15 +1,14 @@
+import 'package:finandy/constants/instances.dart';
 import 'package:finandy/constants/texts.dart';
 import 'package:finandy/screens/otp_verify.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:provider/src/provider.dart';
-// import 'package:sms_autofill/sms_autofill.dart';
+import 'package:provider/src/provider.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
 import 'package:finandy/modals/customer.dart';
 import 'package:finandy/screens/personal_info.dart';
-import 'package:provider/src/provider.dart';
-import 'package:sms_autofill/sms_autofill.dart';
 import 'package:swagger/api.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -65,6 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               maxLength: 10,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                 labelText: mobile,
                                 helperText: onlyAadhar
                               ),
@@ -160,8 +160,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       final signature = await SmsAutoFill().getAppSignature;
                         context.read<Customer>().setPhone(_phone);
                         context.read<Customer>().setUserState(UserState.PhoneEntered);
-                          
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => const OTPverify(fromPage: "signin",)));
+                          try {
+                            final UsersSendotpBody body = UsersSendotpBody.fromJson({
+                              'client_id': clientId,
+                              "phone_number":
+                                  Provider.of<Customer>(context, listen: false).primaryPhoneNumber
+                            });
+                            final res = await userApi.v1UsersSendOtpPost(body);
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => OTPverify(fromPage: "signin", accessKey: res!.otp.toString(),)));
+                          } catch (e) {
+                            print("PARAMS $e");
+                          }
                      }else {
                        return;
                      }

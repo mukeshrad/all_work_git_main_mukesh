@@ -17,7 +17,7 @@ class NotificationListPage extends StatefulWidget {
 
 class _NotificationList extends State<NotificationListPage> {
 
-  List<NotificationModel> notificationList = [];
+  List<Notifications> notificationList = [];
 
   @override
   void initState() {
@@ -61,12 +61,13 @@ class _NotificationList extends State<NotificationListPage> {
     apiClient.setAccessToken(token.toString());
     print(token.toString());
     try {
-      var response = await userApi
+      var response = await notificationApi
           .v1UsersNotificationGet(userId);
       print("result:${response}");
       setState(() {
-        notificationList =  response.notifications!;
+        notificationList =  response.notifications;
       });
+
     } catch (e) {
       print(
           "Exception when calling NotificationApi->v1Notification: $e\n");

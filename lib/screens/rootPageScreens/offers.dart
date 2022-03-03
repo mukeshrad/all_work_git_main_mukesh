@@ -80,7 +80,7 @@ class _AllOffersState extends State<AllOffers> {
     return Scaffold(
       appBar:  AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(
           color: Colors.black
         ),

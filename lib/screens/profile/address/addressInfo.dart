@@ -4,18 +4,18 @@ import 'package:finandy/utils/appBar.dart';
 import 'package:finandy/utils/textField.dart';
 import 'package:finandy/utils/usedButton.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swagger/api.dart';
 
-class AdressInfo extends StatefulWidget {
-  const AdressInfo({Key? key}) : super(key: key);
+class AddressInfo extends StatefulWidget {
+  const AddressInfo({Key? key}) : super(key: key);
 
   @override
-  _AdressInfoState createState() => _AdressInfoState();
+  _AddressInfoState createState() => _AddressInfoState();
 }
 
-class _AdressInfoState extends State<AdressInfo> {
+class _AddressInfoState extends State<AddressInfo> {
   TextEditingController houseNoController = TextEditingController();
   TextEditingController areaController = TextEditingController();
   TextEditingController landmarkController = TextEditingController();
@@ -24,10 +24,10 @@ class _AdressInfoState extends State<AdressInfo> {
 
   bool isEdit = false;
   bool startUpdate = false;
-  String intial_occupation = "Select";
+  String initialownership = "Select";
   String? intialLocation = 'Select';
 
-  final List<String> _occupation = ['Select', 'Owned', 'Rented'];
+  final List<String> ownershipList = ['Select', 'Owned', 'Rented'];
   final List<String> _locationList = [
     'Select',
     'Delhi',
@@ -75,26 +75,24 @@ class _AdressInfoState extends State<AdressInfo> {
   }
 
   putData() async {
-    print('${DateTime.now().toString()}');
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    UserResponse userBody = UserResponse.fromJson({
-      "_id": Provider.of<Customer>(context, listen: false).userId,
-      'current_address': {
-        'line_1': houseNoController.text,
-        'line_2': areaController.text,
-        'landmark': landmarkController.text,
-        'city': cityController.text,
-        'pincode': int.parse(pinCodeController.text),
-        'state': intialLocation,
-      },
-    });
-    final res2 = await userApi.v1UsersUserIdPut(
+    final UsersUserIdPutBody userBody = UsersUserIdPutBody();
+    final updatedAddress = CurrentAddress();
+    updatedAddress.ownership = initialownership.trim().toLowerCase();
+    updatedAddress.line_1 = houseNoController.text.trim().toLowerCase();
+    updatedAddress.line_2 = areaController.text.trim().toLowerCase();
+    updatedAddress.landmark = landmarkController.text.trim().toLowerCase();
+    updatedAddress.city = cityController.text.trim().toLowerCase();
+    updatedAddress.pincode = int.parse(pinCodeController.text);
+    updatedAddress.state = intialLocation?.trim().toLowerCase();
+    userBody.currentAddress = updatedAddress;
+
+    final userResponse = await userApi.v1UsersUserIdPut(
         '${Provider.of<Customer>(context, listen: false).userId}',
         body: userBody);
     Provider.of<Customer>(context, listen: false)
-        .setCustomer(res2.toJson(), UserState.OTPVerified);
+        .setCustomer(userResponse, UserState.OTPVerified);
     print('${Provider.of<Customer>(context, listen: false).currentAddress}');
-    print(res2);
+    print(userResponse);
   }
 
   setData() {
@@ -119,6 +117,8 @@ class _AdressInfoState extends State<AdressInfo> {
     });
     String state =
         '${Provider.of<Customer>(context, listen: false).currentAddress?.state}';
+    String ownerShipType =
+        '${Provider.of<Customer>(context, listen: false).currentAddress?.ownership}';
     if (state == 'null' || state == '') {
       setState(() {
         print(1);
@@ -132,6 +132,17 @@ class _AdressInfoState extends State<AdressInfo> {
         print(2);
         print(intialLocation);
         print(2);
+      });
+    }
+    if (ownerShipType == 'null' ||
+        ownerShipType == '' ||
+        ownerShipType == null) {
+      setState(() {
+        initialownership = 'Select';
+      });
+    } else {
+      setState(() {
+        initialownership = ownerShipType;
       });
     }
   }
@@ -151,10 +162,10 @@ class _AdressInfoState extends State<AdressInfo> {
 
   void onOccupationTypeDropDownChanged(String? value) {
     setState(() {
-      intial_occupation = value!;
+      initialownership = value!;
       isEdit = true;
       print(value);
-      print(intialLocation);
+      print(initialownership);
     });
   }
 
@@ -163,7 +174,7 @@ class _AdressInfoState extends State<AdressInfo> {
     // TODO: implement initState
     super.initState();
     setState(() {
-      intial_occupation = "Select";
+      initialownership = "Select";
     });
     setData();
   }
@@ -187,63 +198,62 @@ class _AdressInfoState extends State<AdressInfo> {
                   const SizedBox(
                     height: 25.0,
                   ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: dropDownButton(
-                        value: intial_occupation,
-                        list: _occupation,
-                        onChanged: onOccupationTypeDropDownChanged),
-                  ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: Textfield(
-                      labelText: 'Flat/House No./Building/Apartment',
-                      onChanged: onChanged,
-                      controller: houseNoController,
-                    ),
-                  ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: Textfield(
-                      labelText: 'Area/Street/Sector/Village',
-                      onChanged: onChanged,
-                      controller: areaController,
-                    ),
-                  ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: Textfield(
-                      labelText: 'Landmark',
-                      onChanged: onChanged,
-                      controller: landmarkController,
-                    ),
-                  ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: Textfield(
-                      labelText: 'Town/City',
-                      onChanged: onChanged,
-                      controller: cityController,
-                    ),
-                  ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: Textfield(
-                      labelText: 'Pin Code',
-                      onChanged: onChanged,
-                      textInputType: TextInputType.number,
-                      controller: pinCodeController,
-                    ),
+                  dropDownButton(
+                    value: initialownership,
+                    list: ownershipList,
+                    onChanged: onOccupationTypeDropDownChanged,
+                    fieldName: 'Ownership Type',
                   ),
                   const SizedBox(
                     height: 25.0,
                   ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: dropDownButton(
-                        value: intialLocation,
-                        list: _locationList,
-                        onChanged: onStateDropDownChanged,),
+                  Textfield(
+                    labelText: 'Flat/House No./Building/Apartment',
+                    onChanged: onChanged,
+                    controller: houseNoController,
+                  ),
+                  const SizedBox(
+                    height: 25.0,
+                  ),
+                  Textfield(
+                    labelText: 'Area/Street/Sector/Village',
+                    onChanged: onChanged,
+                    controller: areaController,
+                  ),
+                  const SizedBox(
+                    height: 25.0,
+                  ),
+                  Textfield(
+                    labelText: 'Landmark',
+                    onChanged: onChanged,
+                    controller: landmarkController,
+                  ),
+                  const SizedBox(
+                    height: 25.0,
+                  ),
+                  Textfield(
+                    labelText: 'Town/City',
+                    onChanged: onChanged,
+                    controller: cityController,
+                  ),
+                  const SizedBox(
+                    height: 25.0,
+                  ),
+                  Textfield(
+                    labelText: 'Pin Code',
+                    onChanged: onChanged,
+                    textInputType: TextInputType.number,
+                    controller: pinCodeController,
+                    noOfAlphabets: 6,
+                  ),
+                  const SizedBox(
+                    height: 25.0,
+                  ),
+                  dropDownButton(
+                    value: intialLocation,
+                    list: _locationList,
+                    onChanged: onStateDropDownChanged,
+                    fieldName: 'State*',
                   ),
                 ],
               ),
@@ -269,6 +279,14 @@ class _AdressInfoState extends State<AdressInfo> {
                         startUpdate = false;
                         isEdit = false;
                       });
+                      Fluttertoast.showToast(
+                          msg: "Data Updated Successfully",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Color(0xff084E6C),
+                          textColor: Colors.white,
+                          fontSize: 16.0);
                     },
                   )
                 : Container(),
@@ -280,13 +298,15 @@ class _AdressInfoState extends State<AdressInfo> {
 
   Container dropDownButton({
     required value,
+    required String fieldName,
     required List<String> list,
     required void Function(String? value)? onChanged,
   }) {
     return Container(
       decoration: BoxDecoration(
-          color: const Color(0xffEBEBEB),
-          borderRadius: BorderRadius.circular(8.0)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
       child: DropdownButtonFormField<String>(
         validator: (value) {
           if (value == null) {
@@ -308,9 +328,11 @@ class _AdressInfoState extends State<AdressInfo> {
           );
         }).toList(),
         onChanged: onChanged,
-        decoration: const InputDecoration(
-          labelText: "State*",
-          enabledBorder: OutlineInputBorder(
+        decoration: InputDecoration(
+          labelText: fieldName,
+          focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10))),
+          enabledBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
       ),

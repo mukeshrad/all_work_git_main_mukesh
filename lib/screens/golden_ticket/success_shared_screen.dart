@@ -1,10 +1,15 @@
+import 'package:finandy/screens/rootPageScreens/root_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/usedButton.dart';
 
 class TicketSharedSuccessFull extends StatefulWidget {
-  const TicketSharedSuccessFull({Key? key}) : super(key: key);
+  final String name;
+  final String phoneNo;
+  const TicketSharedSuccessFull(
+      {Key? key, required this.name, required this.phoneNo})
+      : super(key: key);
 
   @override
   _TicketSharedSuccessFullState createState() =>
@@ -79,9 +84,7 @@ class _TicketSharedSuccessFullState extends State<TicketSharedSuccessFull> {
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.0),
         ),
       ),
-      onpressed: () {
-        sendToscreen(const TicketSharedSuccessFull());
-      },
+      onpressed: () {},
       prefix: const Padding(
         padding: EdgeInsets.only(right: 19.0),
         child: Icon(
@@ -119,7 +122,11 @@ class _TicketSharedSuccessFullState extends State<TicketSharedSuccessFull> {
             vertical: 14.0,
           )),
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const RootPage()),
+              (route) => false);
+        },
         child: const Text(
           'Home',
           style: TextStyle(
@@ -165,14 +172,14 @@ class _TicketSharedSuccessFullState extends State<TicketSharedSuccessFull> {
           ),
           buildDetailRow(
             title: 'Name',
-            title_value: 'Chandresh Rai',
+            title_value: widget.name,
           ),
           SizedBox(
             height: 16.0,
           ),
           buildDetailRow(
             title: 'Phone No.',
-            title_value: '9988789576',
+            title_value: widget.phoneNo,
           ),
         ],
       ),
@@ -189,7 +196,7 @@ class _TicketSharedSuccessFullState extends State<TicketSharedSuccessFull> {
   Center buildDiscription() {
     return Center(
       child: Text(
-        'Thank you for helping Chandresh Rai\n on her Credit Journey',
+        'Thank you for helping ${widget.name}\n on her Credit Journey',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 16.0,

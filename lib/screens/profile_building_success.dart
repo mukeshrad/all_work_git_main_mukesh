@@ -100,7 +100,7 @@ class _ProfileBuildingSuccessState extends State<ProfileBuildingSuccess> {
                          ),
                  ElevatedButton(
                    onPressed: (){
-                     
+                     Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const RootPage()), (route) => false);
                    },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,

@@ -17,7 +17,7 @@ class _MonthTransactionHistoryState extends State<MonthTransactionHistory> {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -59,7 +59,7 @@ class _MonthTransactionHistoryState extends State<MonthTransactionHistory> {
           Text(
             'Download PDF',
             style: TextStyle(
-              fontSize: 14.0,
+              fontSize: 12.0,
               color: Color(0xffFF5130),
             ),
           ),

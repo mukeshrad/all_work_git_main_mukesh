@@ -1,12 +1,12 @@
-import 'dart:convert';
 import 'dart:math';
 import 'package:finandy/constants/Colors.dart';
-import 'package:finandy/constants/texts.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:finandy/modals/bill.dart';
+import 'package:finandy/modals/card_schema.dart';
+import 'package:finandy/modals/customer.dart';
+import 'package:finandy/utils/credit_card.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:swagger/api.dart';
 import 'package:universal_io/io.dart' as io;
 import 'package:finandy/screens/Upi%20Payment/src/api.dart';
 import 'package:finandy/screens/Upi%20Payment/src/discovery.dart';
@@ -16,12 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
 
-
-import '../../constants/instances.dart';
-import '../../modals/require.dart';
-import '../scan_pay/qr_scan-enter-pin.dart';
 import 'Payment_Declined.dart';
 import 'Payment_Received.dart';
 
@@ -30,17 +25,11 @@ class PayInformation extends StatefulWidget {
   const PayInformation({Key? key,required this.isScreen}) : super(key: key);
 
 
-
-
-
-
   @override
   _PayInformationState createState() => _PayInformationState();
 }
 
 class _PayInformationState extends State<PayInformation> {
-
-
 
   var payInfoTypeScreen = "bilPay";
   String val = '';
@@ -51,39 +40,61 @@ class _PayInformationState extends State<PayInformation> {
 
   var selectIndex = 0;
   var responce = "";
-
+  double billAmount = 0;
   final txtEnterAmount = TextEditingController();
-  var currentDate = "";
-  String price = "01.00";
-  String upi = "q53235427@ybl";
+  String dueDateFormatted = "--";
 
-  late Map SendData;
+  initiateTransaction() async {
+    String upiUrl =
+        'upi://pay?pa=7220858116@apl&pn=Deepak Kumar&am=10.0&cu=INR';
+    await launch(upiUrl).then((value) {
+      if (kDebugMode) {
+        // print(value);
+      }
+    }).catchError((err) =>
+        print(err)
+    );
+  }
+  var userId = "";
+  getUserDetails() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var id = preferences.get("userId");
+    Object? token = preferences.get("token");
+    print('token is :$token');
+    print("user ID : $id");
+    setState(() {
+      userId = id.toString();
+    });
+  }
+
   Future<void> _onTap(ApplicationMeta app) async {
 
     //:- Add TODO for actual integration.
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
     // print("Starting transaction with id $transactionRef");
 
-
+    String price = billAmount.toString();
+    Customer user = Provider.of<Customer>(context, listen: false);
+    String? upi = user.upiId;
+    if (upi == null) {
+      throw Exception("VPA is not assigned to customer");
+    }
 
     final paymentResponce = await UpiPay.initiateTransaction(
       amount: price,
       app: app.upiApplication,
-      receiverName: 'Mukesh Kumawat',
+      receiverName: user.customerName ?? "",
       receiverUpiAddress: upi,
       transactionRef: transactionRef,
-      transactionNote: 'UPI Payment',
-      // merchantCode: '7372',
+      transactionNote: 'Bill payment',
     );
 
-    // print(paymentResponce.toString());
+    print('UPI Payment response: $paymentResponce');
 
     if (paymentResponce.status == UpiTransactionStatus.failure) {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => PaymentDeclined()));
     } else if (paymentResponce.status == UpiTransactionStatus.success) {
-
-
       var now = DateTime.now();
       var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
       String getDate = formatter1.format(now);
@@ -98,11 +109,6 @@ class _PayInformationState extends State<PayInformation> {
       paymentDetails.date = getDate;
       paymentDetails.time = getTime;
       paymentDetails.location = "";
-
-      // setState(() {
-      //   SendData = paymentDetails as Map;
-      // });
-      // createTransaction(SendData);
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => PaymentReceived(
@@ -130,21 +136,18 @@ class _PayInformationState extends State<PayInformation> {
   @override
   void initState() {
     super.initState();
-    locationHandler(_getUserPosition);
+    //
+    // MobileNumber.listenPhonePermission((isPermissionGranted) {
+    //   if (isPermissionGranted) {
+    //     initMobileNumberState();
+    //   } else {}
+    // });
+    //
+    // initMobileNumberState();
+
     payInfoTypeScreen = widget.isScreen;
 
     // print("widget.isScreen : $payInfoTypeScreen");
-
-    setState(() {
-
-      txtEnterAmount.text = "500";
-      var now = DateTime.now();
-      var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
-      String getDate = formatter1.format(now);
-      currentDate = getDate;
-    });
-
-
 
     Future.delayed(Duration(milliseconds: 0), () async {
       _apps = (await UpiPay.getInstalledUpiApplications(
@@ -152,35 +155,42 @@ class _PayInformationState extends State<PayInformation> {
           .cast<ApplicationMeta>();
       setState(() {});
     });
-
     getUserDetails();
   }
 
-  Position? position;
-  locationHandler(getLocation) {
-    Requires req = Requires();
-    req.checkStatus(req.location, getLocation);
-  }
+// Platform messages are asynchronous, so we initialize in an async method.
+//   Future<void> initMobileNumberState() async {
+//     if (!await MobileNumber.hasPhonePermission) {
+//       await MobileNumber.requestPhonePermission;
+//       return;
+//     }
+//     String mobileNumber = '';
+//     // Platform messages may fail, so we use a try/catch PlatformException.
+//     try {
+//       mobileNumber = (await MobileNumber.mobileNumber)!;
+//       _simCard = (await MobileNumber.getSimCards)!;
+//     } on PlatformException catch (e) {
+//       debugPrint("Failed to get mobile number because of '${e.message}'");
+//     }
+//
+//     // If the widget was removed from the tree while the asynchronous platform
+//     // message was in flight, we want to discard the reply rather than calling
+//     // setState to update our non-existent appearance.
+//     if (!mounted) return;
+//
+//     setState(() {
+//       _mobileNumber = mobileNumber;
+//     });
+//   }
 
-  void _getUserPosition() async {
-    Position userLocation = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      position = userLocation;
-    });
-  }
-
-  var userId = "";
-  getUserDetails() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    var id = preferences.get("userId");
-    print("user ID : $id");
-    setState(() {
-      userId = id.toString();
-    });
-
-  }
   Widget build(BuildContext context) {
+    billAmount = Provider.of<BillSchema>(context, listen: true).amount;
+    txtEnterAmount.text = billAmount.toString();
+    final DateTime? dueDate = Provider.of<BillSchema>(context, listen: true).dueDate;
+    if (dueDate != null) {
+      var formatter1 = new DateFormat('MMM dd, yyyy'); //yyyy-MM-dd
+      dueDateFormatted = formatter1.format(dueDate);
+    }
     return Scaffold(
       backgroundColor: appWhiteColor,
       appBar: AppBar(
@@ -207,185 +217,23 @@ class _PayInformationState extends State<PayInformation> {
 
   Widget cardUser() {
     return Container(
-      margin: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: appBlueGColor.withOpacity(0.6), //appBlueGColor.withOpacity(0.5),
-        borderRadius: const BorderRadius.all(Radius.circular(15)),
-      ),
-      child: Container(
-        // height: 170,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Color(0xFF0E0E0E), Color(0xFF0E0E0E)]),
-            border: Border.all(color: appGreyColor, width: 0.2),
-            // color: Colors.blue,
-            borderRadius: const BorderRadius.all(Radius.circular(15)),
-            image: DecorationImage(
-                opacity: 0.2,
-                image: Image.asset(
-                  "asset/Paymenticon/bgCard.jpeg",
-                  height: 20,
-                  width: 20,
-                ).image,
-                fit: BoxFit.cover)),
-        child: Column(
-          children: [
-            Container(
-              // height:  40,
-              padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 5),
-
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    "My E-Card",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: appWhiteColor),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-
-                  Row(
-                    children: [
-                      Text(
-                        "UPTR",
-                        style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            color: appWhiteColor),
-                      ),
-                      Image.asset(
-                        "assets/images/uptrackLogo.png",
-                        fit: BoxFit.cover,
-                        height: 15,
-                      ),
-                      Text(
-                        "CK",
-                        style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            color: appWhiteColor),
-                      ),
-                    ],
-                  ),
-
-                  // Text(
-                  //   "UPTR CK",
-                  //   style: TextStyle(
-                  //       fontSize: 17,
-                  //       fontWeight: FontWeight.bold,color: appWhiteColor),
-                  // ),
-                ],
-              ),
-            ),
-            Container(
-              // height:  40,
-              padding: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 5),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  Text(
-                    "Card Number",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: appGreyColor,
-                        fontWeight: FontWeight.normal),
-                  ),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Text(
-                    "7987 8453 98",
-                    style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: appWhiteColor),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    // height:  40,
-                    padding: EdgeInsets.only(left: 20),
-                    child: Column(
-                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Text(
-                          "Total Card Limit",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: appGreyColor,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          "₹ 4000.00",
-                          style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: appWhiteColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 10, bottom: 10),
-                    width: 0.1,
-                    height: 50,
-                    // height: double.infinity,
-                    color: appGreyDarkColor,
-                  ),
-                  Container(
-                    // height:  40,
-                    padding: EdgeInsets.only(right: 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Text(
-                          "Weekly Limit",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: appGreyColor,
-                              fontWeight: FontWeight.normal),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          "₹ 1000.00",
-                          style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: appWhiteColor),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+        margin: const EdgeInsets.only(left: 12, right: 12, bottom: 5),
+        child: UptrackCard(
+            bankName:
+            "${Provider.of<CardSchema>(context, listen: false).bankName}",
+            cardNumber:
+            "${Provider.of<CardSchema>(context, listen: false).cardNumber}",
+            cardType:
+            "${Provider.of<CardSchema>(context, listen: false).cardType}",
+            expiry:
+            "${Provider.of<CardSchema>(context, listen: false).expiry}",
+            ownerName:
+            "${Provider.of<CardSchema>(context, listen: false).ownerName}",
+            cardNoTitle: "Card Number",
+            monthlyLimit:
+            "${Provider.of<CardSchema>(context, listen: false).limits!.monthly}"));
   }
+
   Widget paymentInfo(){
     if (payInfoTypeScreen == "bilPay"){
       return Container(
@@ -406,13 +254,11 @@ class _PayInformationState extends State<PayInformation> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    // height:  40,
-
                     padding: EdgeInsets.only(left: 20),
                     alignment: Alignment.centerLeft,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Payment Due",
                           style: TextStyle(
@@ -424,8 +270,7 @@ class _PayInformationState extends State<PayInformation> {
                           height: 8,
                         ),
                         Text(
-                          "₹ 500",
-                          textAlign: TextAlign.left,
+                          "$billAmount",
                           style: TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                         ),
@@ -459,7 +304,7 @@ class _PayInformationState extends State<PayInformation> {
                           height: 8,
                         ),
                         Text(
-                          currentDate,
+                          dueDateFormatted,
                           style: TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                         ),
@@ -632,7 +477,7 @@ class _PayInformationState extends State<PayInformation> {
                   TextButton(
                     onPressed: () {},
                     child: Text(
-                      currentDate,
+                      dueDateFormatted,
                       style: TextStyle(
                           fontSize: 16,
                           color: appBlackColor,
@@ -1004,7 +849,6 @@ class _PayInformationState extends State<PayInformation> {
           });
         });
   }
-
 }
 
 class UpiPaymentResponse {

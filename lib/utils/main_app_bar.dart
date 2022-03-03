@@ -30,10 +30,10 @@ class _MainAppBarState extends State<MainAppBar> {
   Widget build(BuildContext context) {
     return  AppBar(
         iconTheme: const IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        title: Text("${context.watch<Customer>().customerName}", style: const TextStyle(
+        title: Text(widget.title == "rootPage" ? "${context.watch<Customer>().customerName}" : widget.title, style: const TextStyle(
            fontSize: 18,
            color: Colors.black,
            overflow: TextOverflow.fade
@@ -55,7 +55,8 @@ class _MainAppBarState extends State<MainAppBar> {
               radius: 15,
               backgroundColor: Colors.black12,
               child: GestureDetector(
-                onTap: (){},
+                onTap: (){  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => NotificationListPage()));},
                 child: const Icon(Icons.notifications_none_sharp, color: Colors.black, size: 20,)
                 ),
             ),
@@ -68,23 +69,13 @@ class _MainAppBarState extends State<MainAppBar> {
                     radius: 15,
                     child: ClipOval(
                      child: Image.network(
-                       userImg,
+                       context.watch<Customer>().profileImage??userImg,
                        fit: BoxFit.cover
                        ),
                      ),
                   ),
                 ),
               ),
-            IconButton(
-              onPressed: (){
-
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => NotificationListPage()));
-
-
-              },
-              icon: const Icon(Icons.notifications_none_sharp)
-              )  
           ],
       );
   }

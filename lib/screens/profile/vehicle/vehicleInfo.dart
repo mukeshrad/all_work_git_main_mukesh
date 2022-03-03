@@ -1,10 +1,18 @@
+import 'dart:io';
+
 import 'package:finandy/modals/customer.dart';
+import 'package:finandy/screens/profile/vehicle/viewImageScreen.dart';
 import 'package:finandy/utils/appBar.dart';
 import 'package:finandy/utils/textField.dart';
 import 'package:finandy/utils/usedButton.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:swagger/api.dart';
+
+import '../../../constants/instances.dart';
 
 class VehicleDetails extends StatefulWidget {
   const VehicleDetails({Key? key}) : super(key: key);
@@ -15,11 +23,14 @@ class VehicleDetails extends StatefulWidget {
 
 class _VehicleDetailsState extends State<VehicleDetails> {
   TextEditingController vehicleNoController = TextEditingController();
+  TextEditingController rcController = TextEditingController();
   // TextEditingController _adharController = TextEditingController();
   // TextEditingController _genderController = TextEditingController();
   // TextEditingController _dateofBirthController = TextEditingController();
   // TextEditingController _residentialPinCodeController = TextEditingController();
   String vehicleType = "Car";
+  bool isEdit = false;
+  File? _image;
   String bottomSheetVehicleType = '';
   final GlobalKey _menuKey = GlobalKey();
   static const List<String> choices = <String>['View', 'Replace', "Delete"];
@@ -49,11 +60,15 @@ class _VehicleDetailsState extends State<VehicleDetails> {
 
   void choiceAction(String choice) {
     if (choice == 'View') {
+      sendToscreen(
+        ViewImage(image: _image!),
+      );
       if (kDebugMode) {
         print('View');
       }
     }
     if (choice == 'Replace') {
+      getImagefromGallery();
       if (kDebugMode) {
         print('Replace');
       }
@@ -63,6 +78,45 @@ class _VehicleDetailsState extends State<VehicleDetails> {
         print('Delete');
       }
     }
+  }
+
+  putData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    Object? token = preferences.get("token");
+    apiClient.setAccessToken(token as String);
+
+    UserIdDocumentsBody userIdDocumentsBody = UserIdDocumentsBody.fromJson({
+      "purpose": 'AssetProof',
+      "id_number": rcController.text.trim(),
+      'type': 'RC',
+      // 'metadata': 'metadata',
+      // 'adhaarLinkedMobile': 'string',
+      // 'bankAccountIFSC': 'string',
+
+      // 'image': 'image',
+    });
+    var r = documentsApi.v1UsersUserIdDocumentsPost(
+      '${Provider.of<Customer>(context, listen: false).userId}',
+      body: userIdDocumentsBody,
+      documentFiles: _image!.path,
+    );
+    print(r);
+  }
+
+  Future getImagefromGallery() async {
+    print('harsh ohia');
+    var image =
+        await ImagePicker.platform.getImage(source: ImageSource.gallery);
+    final File? file = File(image!.path);
+    setState(() {
+      _image = file;
+      print(_image?.path);
+    });
+    // print(json);
+  }
+
+  void onChanged(String value) {
+    setState(() => isEdit = true);
   }
 
   @override
@@ -78,23 +132,29 @@ class _VehicleDetailsState extends State<VehicleDetails> {
             Expanded(
               child: ListView(
                 children: [
-                  NewAppBar(
+                  const NewAppBar(
                     pageName: 'Vehicle Details',
                     // prefix: buildAddButton(context),
                   ),
                   const SizedBox(
                     height: 25.0,
                   ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: dropDownFieldButton(),
+                  dropDownFieldButton(),
+                  const SizedBox(
+                    height: 25.0,
                   ),
-                  IgnorePointer(
-                    ignoring: true,
-                    child: Textfield(
-                      labelText: 'Vehicle *',
-                      controller: vehicleNoController,
-                    ),
+                  Textfield(
+                    labelText: 'Vehicle Number *',
+                    controller: vehicleNoController,
+                    onChanged: onChanged,
+                  ),
+                  const SizedBox(
+                    height: 25.0,
+                  ),
+                  Textfield(
+                    labelText: 'RC Number *',
+                    controller: rcController,
+                    onChanged: onChanged,
                   ),
                   const SizedBox(
                     height: 25.0,
@@ -110,7 +170,9 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.0),
                 ),
               ),
-              onpressed: () {},
+              onpressed: () {
+                putData();
+              },
             ),
           ],
         ),
@@ -127,7 +189,9 @@ class _VehicleDetailsState extends State<VehicleDetails> {
           Container(
             child: Column(
               children: [
-                Image.asset('assets/images/cashback.gif'),
+                _image == null
+                    ? Image.asset('assets/images/cashback.gif')
+                    : Image.file(_image!),
                 ListTile(
                   title: Text("image.123"),
                   trailing: PopupMenuButton<String>(
@@ -282,8 +346,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
   Container dropDownFieldButton() {
     return Container(
       decoration: BoxDecoration(
-          color: const Color(0xffEBEBEB),
-          borderRadius: BorderRadius.circular(8.0)),
+          color: Colors.white, borderRadius: BorderRadius.circular(8.0)),
       child: DropdownButtonFormField(
         validator: (value) {
           if (value == null) {
@@ -316,7 +379,7 @@ class _VehicleDetailsState extends State<VehicleDetails> {
           });
         },
         decoration: const InputDecoration(
-          labelText: "Occupation Type*",
+          labelText: "Vehicle Type*",
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10))),
         ),

@@ -1,19 +1,26 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:finandy/constants/instances.dart';
 import 'package:finandy/screens/scan_pay/qr_scan-amt-desc.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-class CustomSizeScannerPage extends StatefulWidget {
+class QrScanPage extends StatefulWidget {
   @override
-  _CustomSizeScannerPageState createState() => _CustomSizeScannerPageState();
+  _QrScanPageState createState() => _QrScanPageState();
 }
 
-class _CustomSizeScannerPageState extends State<CustomSizeScannerPage> {
+class _QrScanPageState extends State<QrScanPage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   late QRViewController controller;
+  bool validMerchant = true;
+  late Map mercDetails;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,38 +32,42 @@ class _CustomSizeScannerPageState extends State<CustomSizeScannerPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
-            height: 0,
-          ),
-          Stack(
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 1.3,
-                child: _buildQrView(context),
-              ),
-              Positioned(
-                  top: 30,
+          Expanded(
+            child: Stack(
+              children: [
+                _buildQrView(context),
+                Positioned(
+                  top: 40,
                   left: 10,
                   child: IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.close_outlined,
                       color: Colors.white,
                     ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  )),
-              Positioned(
-                  top: 30,
+                    onPressed: () {
+                      // controller.stopCamera();
+
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 40,
                   right: 10,
                   child: IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.refresh_outlined,
                       color: Colors.white,
                     ),
                     onPressed: () {
-                      setState(() {});
+                      setState(() {
+                        controller.resumeCamera();
+                      });
                     },
-                  ))
-            ],
+                  ),
+                )
+              ],
+            ),
           ),
           // Row(
           //   children: [
@@ -87,17 +98,18 @@ class _CustomSizeScannerPageState extends State<CustomSizeScannerPage> {
           //         onQRViewCreated: _onQRViewCreated,
           //       ),
           // ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * (1 - 1 / 1.3),
-            child: Align(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Powered By'),
-                    Image.asset("assets/images/poweredbyuptrack.png"),
-                  ],
-                )),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 50.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Powered By'),
+                const SizedBox(
+                  height: 10.0,
+                ),
+                Image.asset("assets/images/poweredbyuptrack.png"),
+              ],
+            ),
           )
         ],
       ),
@@ -105,24 +117,30 @@ class _CustomSizeScannerPageState extends State<CustomSizeScannerPage> {
   }
 
   Widget _buildQrView(BuildContext context) {
-    // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
     var scanArea = (MediaQuery.of(context).size.width < 400 ||
             MediaQuery.of(context).size.height < 400)
         ? 300.0
         : 300.0;
-    // To ensure the Scanner view is properly sizes after rotation
-    // we need to listen for Flutter SizeChanged notification and update controller
     return QRView(
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
       overlay: QrScannerOverlayShape(
-          borderColor: Colors.white,
-          borderRadius: 10,
-          borderLength: 30,
-          borderWidth: 10,
-          cutOutSize: scanArea),
+        borderColor: Colors.white,
+        borderRadius: 10,
+        borderLength: 30,
+        borderWidth: 10,
+        cutOutSize: scanArea,
+      ),
       onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
     );
+  }
+
+  sendToScreen(merchDetails) async {
+    bool r = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => PayScreen(mercDetails: merchDetails)));
+    if (r) {
+      controller.resumeCamera();
+    }
   }
 
   void _onQRViewCreated(QRViewController controller) {
@@ -138,55 +156,59 @@ class _CustomSizeScannerPageState extends State<CustomSizeScannerPage> {
       );
       String? val = scanData.code;
       String verifyupi = regExpupi.stringMatch(val!).toString();
+      // print('qr code is this $val');
       if (verifyupi.startsWith("upi")) {
-        checkMerchantDetail()
-            ? Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => PayScreen(value: val)))
-            : showModalBottomSheet<dynamic>(
-                context: context,
-                builder: (context) =>
-                    Wrap(alignment: WrapAlignment.center, children: [
-                      Container(
-                        child: Column(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.arrow_drop_down_circle),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                controller.resumeCamera();
-                              },
-                            ),
-                            Text(
-                              "Your are not eligilbe for this UPI id \n for payment. Everyday Card not allowed to pay \n any liquor shop",
-                              textAlign: TextAlign.center,
-                            ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 20),
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                CustomSizeScannerPage()));
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.blueAccent,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Text(
-                                      "Please try Again",
-                                      style: TextStyle(fontSize: 20),
+        checkMerchantDetail(val).then((value) {
+          validMerchant
+              ? sendToScreen(mercDetails)
+              : showModalBottomSheet<dynamic>(
+                  context: context,
+                  builder: (context) =>
+                      Wrap(alignment: WrapAlignment.center, children: [
+                        Container(
+                          child: Column(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.arrow_drop_down_circle),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  controller.resumeCamera();
+                                },
+                              ),
+                              const Text(
+                                "Your are not eligilbe for this UPI id \n for payment. Everyday Card not allowed to pay \n any liquor shop",
+                                textAlign: TextAlign.center,
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 20),
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  QrScanPage()));
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Colors.blueAccent,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
                                     ),
-                                  )),
-                            ),
-                          ],
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(15.0),
+                                      child: Text(
+                                        "Please try Again",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                    )),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ]));
+                      ]));
+        });
+
         // controller.resumeCamera();
       } else {
         showModalBottomSheet<dynamic>(
@@ -197,13 +219,13 @@ class _CustomSizeScannerPageState extends State<CustomSizeScannerPage> {
                     child: Column(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.arrow_drop_down_circle),
+                          icon: const Icon(Icons.arrow_drop_down_circle),
                           onPressed: () {
                             Navigator.pop(context);
                             controller.resumeCamera();
                           },
                         ),
-                        Text(
+                        const Text(
                           "Not an UPI QR Code",
                           textAlign: TextAlign.center,
                         ),
@@ -213,16 +235,15 @@ class _CustomSizeScannerPageState extends State<CustomSizeScannerPage> {
                               onPressed: () {
                                 Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            CustomSizeScannerPage()));
+                                        builder: (context) => QrScanPage()));
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.blueAccent,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10)),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
+                              child: const Padding(
+                                padding: EdgeInsets.all(15.0),
                                 child: Text(
                                   "Please try Again",
                                   style: TextStyle(fontSize: 20),
@@ -248,11 +269,32 @@ class _CustomSizeScannerPageState extends State<CustomSizeScannerPage> {
 
   @override
   void dispose() {
+    controller.stopCamera();
     controller.dispose();
     super.dispose();
   }
 
-  bool checkMerchantDetail() => true;
+  Future<void> checkMerchantDetail(result) async {
+    try {
+      var apiResult = await merchantApi.v1MerchantsCheck(result);
+      final Map someMap = {
+        "upi_id": apiResult!.paymentInstruments!.upiId,
+        "name": apiResult.name ?? "Default Name",
+        "merchantCategoryCode": apiResult.merchantCategoryCode ?? "1571",
+        "image": apiResult.images,
+        "qr_code": result
+      };
+      setState(() {
+        mercDetails = someMap;
+        validMerchant = true;
+      });
+    } catch (e) {
+      print("Exception when calling MerchantApi->v1MerchantsCheck: $e\n");
+      setState(() {
+        validMerchant = false;
+      });
+    }
+  }
 }
 //UPI URLm
 //upi://pay?pa=UPIID@oksbi&amp;pn=FNAME SNAME K&amp;cu=INR

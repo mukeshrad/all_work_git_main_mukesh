@@ -1,6 +1,7 @@
 import 'package:finandy/constants/texts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:video_player/video_player.dart';
 
 class ProfileBuildingFailure extends StatefulWidget {
   const ProfileBuildingFailure({ Key? key }) : super(key: key);
@@ -10,20 +11,36 @@ class ProfileBuildingFailure extends StatefulWidget {
 }
 
 class _ProfileBuildingFailureState extends State<ProfileBuildingFailure> {
+   late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
   late SvgPicture bg;
   final _formKey = GlobalKey<FormState>();
   bool checkValue = false;
   var _ticketNo;
+  TextEditingController goldenTicketController = TextEditingController();
   @override
   void initState() {
     super.initState();
     bg = SvgPicture.asset("assets/images/scardbg.svg");
+     _controller = VideoPlayerController.network(
+      'https://assets.mixkit.co/videos/preview/mixkit-going-down-a-curved-highway-down-a-mountain-41576-large.mp4',
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+    );
+    _initializeVideoPlayerFuture = _controller.initialize();
+    _controller.play();
   }
   
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     precachePicture(bg.pictureProvider, context);
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -54,7 +71,38 @@ class _ProfileBuildingFailureState extends State<ProfileBuildingFailure> {
                         ),
                       ),  
                 const SizedBox(height: 10,),
-                bg,
+                FutureBuilder(
+        future: _initializeVideoPlayerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            // If the VideoPlayerController has finished initialization, use
+            // the data it provides to limit the aspect ratio of the video.
+            return AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              // Use the VideoPlayer widget to display the video.
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: <Widget>[
+                  VideoPlayer(_controller),
+                  const ClosedCaption(text: null), 
+                  // Here you can also add Overlay capacities
+                  VideoProgressIndicator(
+                    _controller,
+                    allowScrubbing: true,
+                    padding: EdgeInsets.all(3),
+                    colors: VideoProgressColors(
+                        playedColor: Theme.of(context).primaryColor),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            // If the VideoPlayerController is still initializing, show a
+            // loading spinner.
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
                 const SizedBox(height: 7,),
                 const Text(
                         askOthers,
@@ -74,6 +122,28 @@ class _ProfileBuildingFailureState extends State<ProfileBuildingFailure> {
                         ),
                       ),  
                const SizedBox(height: 45,),
+               Form(
+                 key: _formKey,
+                 child: TextFormField(
+                   controller: goldenTicketController,
+                    keyboardType: TextInputType.number,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    enabled: true,
+                    maxLength: 4,
+                    validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Required';
+                          }
+                          return null;
+                        },
+                    decoration: const InputDecoration(
+                      hintText: "Enter",
+                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      labelText: "Golden Ticket",   
+                      enabled: true, 
+                    ),
+                 )),
                   ElevatedButton(
                    onPressed: () async{
                      if(_formKey.currentState!.validate() && checkValue == true){

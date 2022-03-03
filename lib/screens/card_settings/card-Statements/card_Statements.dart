@@ -19,6 +19,51 @@ class _CardStatementsState extends State<CardStatements> {
     setState(() => isEdit = true);
   }
 
+  // Future getData() async {
+  //   try {
+  //     SharedPreferences preferences = await SharedPreferences.getInstance();
+  //     Object? token = preferences.get("token");
+  //     apiClient.setAccessToken(token as String);
+  //     print(
+  //         '${Provider.of<Customer>(context, listen: false).clientCustomerId}');
+  //     var r = await cardsApi.v1UsersUserIdCardsGet(
+  //         Provider.of<Customer>(context, listen: false).clientCustomerId!);
+  //     var cardId = r?.id;
+  //     print('is it $cardId');
+  //     var ru = await transactionInstance.v1CardsCardIdTransactionsGet(cardId!);
+  //     for (int i = 0; i < ru!.length; i++) {
+  //       var detail = ru[i];
+  //       _list.add(
+  //         TransactionHistoryTile(
+  //           amount: detail.amount.toString(),
+  //           transactionId: detail.transactionId.toString(),
+  //           callback: () {
+  //             // getData();
+  //             buildShowModalBottomSheet(
+  //               context: context,
+  //               personName: detail.merchantCategoryCode.toString(),
+  //               transactionId: detail.transactionId.toString(),
+  //               amount: detail.amount.toString(),
+  //               date: detail.paymentCompletionTime.toString(),
+  //               time: detail.paymentCompletionTime.toString(),
+  //               location: 'Gurugram',
+  //             );
+  //           },
+  //           personName: 'Shri Ram Dhaba',
+  //         ),
+  //       );
+  //     }
+  //
+  //     //     .setCustomer(r?.toJson(), UserState.LoggedIn);
+  //     // print(
+  //     //     'we have ${Provider.of<Customer>(context, listen: false).customerName}');
+  //
+  //     // final data = result;*/
+  //   } catch (e) {
+  //     print("Exception when calling CardApi->v1UsersUserIdCardsGet: $e\n");
+  //   }
+  // }
+
   void onYearDropDownChanged(String? value) {
     setState(() {
       initial_year = value!;
@@ -40,7 +85,7 @@ class _CardStatementsState extends State<CardStatements> {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

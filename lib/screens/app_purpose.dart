@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:finandy/constants/texts.dart';
 import 'package:finandy/modals/customer.dart';
+import 'package:finandy/modals/require.dart';
 import 'package:finandy/screens/request_permissions.dart';
 import 'package:finandy/screens/signin.dart';
+import 'package:finandy/services/permissions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:provider/src/provider.dart';
-// import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPurpose extends StatefulWidget {
@@ -88,7 +89,7 @@ class _AppPurposeState extends State<AppPurpose> {
 
   getTab(){
     return Container(
-
+      
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -101,10 +102,11 @@ class _AppPurposeState extends State<AppPurpose> {
                 height: 70,
                 child: TextButton(
                   onPressed: (){
-                       bool accept = context.read<Customer>().isPermissionGiven();
-                     Navigator.of(context).pushNamed(accept ? "/signin" : "/reqPerm");
+                     bool accepted = checkAllPermissions();
+                     print(accepted);
+                     Navigator.of(context).pushNamed(accepted ? "/signin" : "/reqPerm");
                     },
-                  child: Text(idx != 0 ? skip : "",
+                  child: Text(idx != 0 ? skip : "", 
                     style: const TextStyle(
                       fontSize: 14
                     ),
@@ -130,7 +132,7 @@ class _AppPurposeState extends State<AppPurpose> {
                   ),
                   Container(
                     margin: const EdgeInsets.only(left: 10, right: 10, top: 5),
-                    child: Text(des[idx],
+                    child: Text(des[idx], 
                       softWrap: true,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
@@ -145,18 +147,22 @@ class _AppPurposeState extends State<AppPurpose> {
                margin: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
                child: ElevatedButton(
                  onPressed: (){
-                  bool accept = context.read<Customer>().isPermissionGiven();
-                     Navigator.of(context).pushNamed(accept ? "/signin" : "/reqPerm");
-                    },
+                   Requires req = Requires();
+                    req.checkGranted().then((value) {
+                      Navigator.of(context).pushNamed(value ? "/signin" : "/reqPerm"); 
+                    }).onError((error, stackTrace) {
+                       Navigator.of(context).pushNamed("/reqPerm"); 
+                    });   
+                    }, 
                        style: ElevatedButton.styleFrom(
                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 2),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                        child: const Padding(
                          padding: EdgeInsets.all(8.0),
-                         child:
+                         child: 
                              Text(letsGetStarted, style: TextStyle(fontSize: 18),),
-                        )
+                        ) 
                        ),
              ),
              Row(

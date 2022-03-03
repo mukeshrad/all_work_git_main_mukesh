@@ -1,4 +1,3 @@
-import 'package:finandy/screens/Payment/Bil_Pay.dart';
 import 'package:finandy/modals/bill.dart';
 import 'package:finandy/modals/card_schema.dart';
 import 'package:finandy/utils/widget_wrapper.dart';
@@ -24,7 +23,7 @@ class _ExpensesCardState extends State<ExpensesCard> {
   void initState() {
     super.initState();
      setState(() {
-
+     
      });
   }
 
@@ -54,7 +53,7 @@ class _ExpensesCardState extends State<ExpensesCard> {
                     children: [
                       Container(
                         margin: const EdgeInsets.only(bottom: 3),
-                        child: const Text("Monthly Limit",
+                        child: const Text("Monthly Limit", 
                           style: TextStyle(
                             fontSize: 16
                           ),
@@ -98,7 +97,7 @@ class _ExpensesCardState extends State<ExpensesCard> {
                 spendingAmount: limit,
                 spendingPctOfTotal: (limit == 0 ? 0 : availableLimit/limit),
                 color: Colors.red,
-                height: 20.0,
+                height: 15.0,
                 border: true,
               ),
             ],

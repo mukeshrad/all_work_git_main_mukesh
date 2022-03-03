@@ -17,3 +17,8 @@ final merchantApi = MerchantsApi(apiClient);
 final goldenTicketApi = GoldenTicketsApi(apiClient);
 
 final billApi = BillsApi(apiClient);
+
+final quizApi = QuizApi(apiClient);
+
+final notificationApi = NotificationApi(apiClient);
+

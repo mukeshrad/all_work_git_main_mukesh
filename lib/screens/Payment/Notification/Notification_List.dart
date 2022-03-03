@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swagger/api.dart';
 
@@ -16,7 +17,7 @@ class NotificationListPage extends StatefulWidget {
 
 class _NotificationList extends State<NotificationListPage> {
 
-  List<Notifications> notificationList = [];
+  List<NotificationModel> notificationList = [];
 
   @override
   void initState() {
@@ -60,14 +61,12 @@ class _NotificationList extends State<NotificationListPage> {
     apiClient.setAccessToken(token.toString());
     print(token.toString());
     try {
-      var response = await notificationApi
+      var response = await userApi
           .v1UsersNotificationGet(userId);
       print("result:${response}");
       setState(() {
-        notificationList =  response.notifications;
+        notificationList =  response.notifications!;
       });
-
-
     } catch (e) {
       print(
           "Exception when calling NotificationApi->v1Notification: $e\n");
@@ -131,6 +130,11 @@ class _NotificationList extends State<NotificationListPage> {
 
   Widget ContactsView(BuildContext context, int index) {
     var item = notificationList[index];
+
+    var date = item.created.toString();
+    DateTime dt = DateTime.parse(date);
+    String newDate = DateFormat("yyyy-MM-dd").format(dt);
+
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);
@@ -178,7 +182,7 @@ class _NotificationList extends State<NotificationListPage> {
                 ),
                 Container(
                   child: Text(
-                    '2022-02-16',
+                    newDate.toString(),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     softWrap: false,

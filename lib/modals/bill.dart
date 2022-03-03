@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:swagger/api.dart';
 
 class BillSchema with ChangeNotifier {
   String? userId;
@@ -24,27 +26,25 @@ class BillSchema with ChangeNotifier {
     this.isMailSent,
   });
 
-  setBill(json){
-     userId = json['user_id'];
-      startDate =  json['start_date'] == null
-          ? null
-          : DateTime.parse(json['start_date'] as String);
-      endDate = json['end_date'] == null
-          ? null
-          : DateTime.parse(json['end_date'] as String);
-      amount = json['amount'] == null ? 0 : (json['amount'] as double);
-      currency = json['currency'] as String?;
-      dueDate = json['due_date'] == null
-          ? null
-          : DateTime.parse(json['due_date'] as String);
-      status = json['status'] as String?;
-      transactionIds = json['transaction_ids'] == null ? List.empty() : (json['transaction_ids'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList();
-      pdfPath = json['pdf_path'] as String?;
-      isMailSent = json['is_mail_sent'] as bool?;
+  setBill(BillResponse bill) {
+    print('Setting bill with $bill');
+    userId = bill.userId;
+    startDate = bill.startDate;
+    endDate = bill.endDate;
+    amount = bill.amount ?? 0;
+    currency = bill.currency;
+    dueDate = bill.dueDate;
+    status = bill.status;
+    transactionIds = bill.transactionIds;
+    pdfPath = bill.pdfPath;
+    isMailSent = bill.isMailSent;
 
-      notifyListeners();
+    notifyListeners();
+  }
+
+  getDueDateFormatted(){
+    final DateFormat formatter = DateFormat('MMM-dd');
+    return dueDate == null ? "--" : formatter.format(dueDate!);
   }
 
   @override

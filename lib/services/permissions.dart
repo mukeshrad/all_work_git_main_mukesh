@@ -43,3 +43,15 @@ cameraHandler(Function func){
   req.checkStatus(req.calls, func);
 }
 
+bool checkAllPermissions(){
+  Requires req = Requires();
+ 
+  bool perm = false;
+  req.checkGranted().then((value){
+     print(value); 
+    perm = value;
+  }).onError((error, stackTrace) {
+    perm = false;
+  });
+  return perm;
+}

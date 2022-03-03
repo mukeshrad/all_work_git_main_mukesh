@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swagger/api.dart';
 
+import '../../constants/constants.dart';
+
 class EmploymentDetails extends StatefulWidget {
   const EmploymentDetails({Key? key}) : super(key: key);
 
@@ -22,17 +24,24 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
   // TextEditingController _genderController = TextEditingController();
   // TextEditingController _dateofBirthController = TextEditingController();
   // TextEditingController _residentialPinCodeController = TextEditingController();
-  late String occupation;
+  String _occupation = 'Select';
   bool isEdit = false;
   bool startUpdate = false;
+  final List<String> occupationList = [
+    'select',
+    'salaried',
+    'self-employed-business owner',
+    'self-employed-business professional',
+    'student',
+  ];
 
   putData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     Object? token = preferences.get("token");
     apiClient.setAccessToken(token as String);
 
-    UserResponse userBody = UserResponse.fromJson({
-      "_id": Provider.of<Customer>(context, listen: false).userId,
+    UsersUserIdPutBody userBody = UsersUserIdPutBody.fromJson({
+      // "id": Provider.of<Customer>(context, listen: false).clientCustomerId,
       // "customer_name":
       //     Provider.of<Customer>(context, listen: false).customerName,
       // "gender": Provider.of<Customer>(context, listen: false).gender,
@@ -55,7 +64,7 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
       // 'customer_preference':
       //     Provider.of<Customer>(context, listen: false).customerPreference,
       'professional_info': {
-        'occupation_type': occupation,
+        'occupation_type': _occupation.toLowerCase(),
         'occupation': companyNameController.text,
         'monthly_earning': int.parse(netMonthlyIncomeController.text),
       },
@@ -66,12 +75,12 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
       // },
       // Provider.of<Customer>(context, listen: false).notificationPreference,
     });
-    final res2 = await userApi.v1UsersUserIdPut(
+    final UserResponse res2 = await userApi.v1UsersUserIdPut(
         '${Provider.of<Customer>(context, listen: false).userId}',
         body: userBody);
 
     Provider.of<Customer>(context, listen: false)
-        .setCustomer(res2.toJson(), UserState.OTPVerified);
+        .setCustomer(res2, UserState.OTPVerified);
     print('${Provider.of<Customer>(context, listen: false).currentAddress}');
     // print(res2?.email);
     print(res2);
@@ -99,11 +108,11 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
         '${Provider.of<Customer>(context, listen: false).professionalInfo?.occupationType}';
     if (localOccupation == 'null' || localOccupation == '') {
       setState(() {
-        occupation = "Select";
+        _occupation = "Select";
       });
     } else {
       setState(() {
-        occupation = localOccupation;
+        _occupation = localOccupation;
       });
     }
   }
@@ -112,10 +121,22 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
     setState(() => isEdit = true);
   }
 
+  void onOccupationTypeDropDownChanged(String? value) {
+    setState(() {
+      _occupation = value!;
+      isEdit = true;
+      print(value);
+      print(_occupation);
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    setState(() {
+      _occupation = "Select";
+    });
     setData();
   }
 
@@ -138,9 +159,14 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
                   const SizedBox(
                     height: 25.0,
                   ),
-                  IgnorePointer(
-                    ignoring: false,
-                    child: dropDownButton(),
+                  dropDownButton(
+                    value: _occupation,
+                    list: occupationList,
+                    onChanged: onOccupationTypeDropDownChanged,
+                    fieldName: 'Occupation Type',
+                  ),
+                  const SizedBox(
+                    height: 25.0,
                   ),
                   IgnorePointer(
                     ignoring: false,
@@ -149,6 +175,9 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
                       onChanged: onChanged,
                       controller: companyNameController,
                     ),
+                  ),
+                  const SizedBox(
+                    height: 25.0,
                   ),
                   IgnorePointer(
                     ignoring: false,
@@ -172,108 +201,155 @@ class _EmploymentDetailsState extends State<EmploymentDetails> {
                 ],
               ),
             ),
-            isEdit
-                ? UsedButton(
-                    buttonName: startUpdate
-                        ? const CircularProgressIndicator()
-                        : const Center(
-                            child: Text(
-                              'Update',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 18.0),
-                            ),
-                          ),
-                    onpressed: () async {
-                      setState(() {
-                        startUpdate = true;
-                      });
-                      await putData();
-                      print('donw');
-
-                      setState(() {
-                        startUpdate = false;
-                        isEdit = false;
-                      });
-                      Fluttertoast.showToast(
-                          msg: "Data Updated Successfully",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Color(0xff084E6C),
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-                    },
-                  )
-                : Container(),
+            isEdit ? buildupdateButton() : Container(),
           ],
         ),
       ),
     ));
   }
 
-  Container dropDownButton() {
+  UsedButton buildupdateButton() {
+    return UsedButton(
+      buttonName: startUpdate
+          ? circularProgressIndicator
+          : const Center(
+              child: Text(
+                'Update',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.0),
+              ),
+            ),
+      onpressed: () async {
+        updateEmploymentData();
+      },
+    );
+  }
+
+  updateEmploymentData() async {
+    setState(() {
+      startUpdate = true;
+    });
+    await putData();
+    print('donw');
+
+    setState(() {
+      startUpdate = false;
+      isEdit = false;
+    });
+    Fluttertoast.showToast(
+        msg: "Data Updated Successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Color(0xff084E6C),
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
+  Container dropDownButton({
+    required value,
+    required String fieldName,
+    required List<String> list,
+    required void Function(String? value)? onChanged,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xffFAFAFA),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
       ),
-      child: DropdownButtonFormField(
+      child: DropdownButtonFormField<String>(
         validator: (value) {
           if (value == null) {
             return 'Required';
           }
           return null;
         },
-        value: occupation,
+        value: value,
         style: const TextStyle(
           fontWeight: FontWeight.w500,
           color: Colors.black,
+          overflow: TextOverflow.ellipsis,
           fontSize: 16.0,
         ),
-        items: const [
-          DropdownMenuItem(
-            child: Text(
-              "Select",
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-            value: "Select",
-          ),
-          DropdownMenuItem(
-            child: Text(
-              "Salaried",
-            ),
-            value: "Salaried",
-          ),
-          DropdownMenuItem(
-            child: Text("Self-Employed-Business Owner"),
-            value: "Self-Employed-Business Owner",
-          ),
-          DropdownMenuItem(
-            child: Text(
-              "Self-Employed-Business Professional",
-            ),
-            value: "Self-Employed-Business Professional",
-          ),
-          DropdownMenuItem(
-            child: Text("Student"),
-            value: "Student",
-          ),
-        ],
-        onChanged: (c) {
-          String occuType = c.toString();
-          setState(() {
-            occupation = occuType;
-            isEdit = true;
-          });
-        },
-        decoration: const InputDecoration(
-          labelText: "Occupation Type*",
-          enabledBorder: OutlineInputBorder(
+        items: list.map((String s) {
+          return DropdownMenuItem<String>(
+            value: s,
+            child: Text(s),
+          );
+        }).toList(),
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          labelText: fieldName,
+          focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10))),
+          enabledBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
       ),
     );
   }
+  // Container dropDownButton() {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: const Color(0xffFAFAFA),
+  //       borderRadius: BorderRadius.circular(8.0),
+  //     ),
+  //     child: DropdownButtonFormField(
+  //       validator: (value) {
+  //         if (value == null) {
+  //           return 'Required';
+  //         }
+  //         return null;
+  //       },
+  //       value: _occupation,
+  //       style: const TextStyle(
+  //         fontWeight: FontWeight.w500,
+  //         color: Colors.black,
+  //         fontSize: 16.0,
+  //       ),
+  //       items: const [
+  //         DropdownMenuItem(
+  //           child: Text(
+  //             "Select",
+  //             style: TextStyle(
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //           value: "Select",
+  //         ),
+  //         DropdownMenuItem(
+  //           child: Text(
+  //             "Salaried",
+  //           ),
+  //           value: "Salaried",
+  //         ),
+  //         DropdownMenuItem(
+  //           child: Text("Self-Employed-Business Owner"),
+  //           value: "Self-Employed-Business Owner",
+  //         ),
+  //         DropdownMenuItem(
+  //           child: Text(
+  //             "Self-Employed-Business Professional",
+  //           ),
+  //           value: "Self-Employed-Business Professional",
+  //         ),
+  //         DropdownMenuItem(
+  //           child: Text("Student"),
+  //           value: "Student",
+  //         ),
+  //       ],
+  //       onChanged: (c) {
+  //         String occuType = c.toString();
+  //         setState(() {
+  //           _occupation = occuType;
+  //           isEdit = true;
+  //         });
+  //       },
+  //       decoration: const InputDecoration(
+  //         labelText: "Occupation Type*",
+  //         enabledBorder: OutlineInputBorder(
+  //             borderRadius: BorderRadius.all(Radius.circular(10))),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

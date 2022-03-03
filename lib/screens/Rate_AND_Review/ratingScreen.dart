@@ -3,8 +3,16 @@ import 'package:finandy/utils/appBar.dart';
 import 'package:finandy/utils/usedButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_star_rating/simple_star_rating.dart';
+import 'package:swagger/api.dart';
+
+import '../../constants/instances.dart';
+import '../../modals/customer.dart';
+import '../../utils/utilityTools.dart';
 
 class RatingScreen extends StatefulWidget {
   const RatingScreen({Key? key}) : super(key: key);
@@ -15,6 +23,7 @@ class RatingScreen extends StatefulWidget {
 
 class _RatingScreenState extends State<RatingScreen> {
   final TextEditingController _controller = TextEditingController();
+  double? rating;
   List<String> imageList = [
     'assets/images/1_Star_Emoji.svg',
     'assets/images/2_Star_Emoji.svg',
@@ -23,6 +32,34 @@ class _RatingScreenState extends State<RatingScreen> {
     'assets/images/5_Star_Emoji.svg',
   ];
   String image = '';
+  putRating() async {
+    try {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      Object? token = preferences.get("token");
+      print('token is :$token');
+      apiClient.setAccessToken(token as String);
+      FeedbackBody feedbackBody = FeedbackBody.fromJson(
+        ({
+          'feedback': _controller.text,
+          'rating': rating?.round(),
+        }),
+      );
+      var r = userApi.v1UsersUserIdAppFeedback(
+          '${Provider.of<Customer>(context, listen: false).userId}',
+          feedbackBody: feedbackBody);
+      _controller.clear();
+      setState(() {
+        rating = 0;
+      });
+      showFlutterToast(
+          toastGravity: ToastGravity.CENTER,
+          msg: "ThankYou So much for Giving you valuable Feedback,Cheers 🥂");
+
+      print(r.toString());
+    } catch (e) {
+      showFlutterToast(msg: e.toString(), toastGravity: ToastGravity.CENTER);
+    }
+  }
 
   open() async {
     print('asdf');
@@ -81,7 +118,8 @@ class _RatingScreenState extends State<RatingScreen> {
                   ),
                 ),
                 onpressed: () {
-                  open();
+                  putRating();
+                  // open();
                 },
               )
             ],
@@ -164,14 +202,15 @@ class _RatingScreenState extends State<RatingScreen> {
             ),
             Center(
               child: SimpleStarRating(
-                allowHalfRating: true,
+                allowHalfRating: false,
                 starCount: 5,
                 rating: 0,
                 size: 32,
                 isReadOnly: false,
                 // allowEditing: true,
-                onRated: (rate) {
+                onRated: (rate) async {
                   setState(() {
+                    rating = rate;
                     if (rate! <= 1) {
                       image = imageList[0];
                     } else if (rate <= 2 && rate >= 1) {

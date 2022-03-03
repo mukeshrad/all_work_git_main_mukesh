@@ -177,7 +177,7 @@ class _UptrackCardState extends State<UptrackCard> {
 
   _buildDetailsBlock(String value) {
     return Container(
-      height: 55,
+      height: 60,
       padding: const EdgeInsets.only(bottom: 15.0, left: 22, right: 22),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

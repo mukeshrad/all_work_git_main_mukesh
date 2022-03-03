@@ -2,15 +2,23 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:finandy/screens/golden_ticket/success_shared_screen.dart';
 import 'package:finandy/utils/appBar.dart';
 import 'package:finandy/utils/usedButton.dart';
+import 'package:finandy/utils/utilityTools.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'package:swagger/api.dart';
 
+import '../../constants/instances.dart';
+import '../../modals/customer.dart';
 import 'Available.dart';
 import 'contactList.dart';
 
 class ShareWithFriendsScreen extends StatefulWidget {
-  const ShareWithFriendsScreen({Key? key}) : super(key: key);
+  final String goldenTicketId;
+  const ShareWithFriendsScreen({Key? key, required this.goldenTicketId})
+      : super(key: key);
 
   @override
   _ShareWithFriendsScreenState createState() => _ShareWithFriendsScreenState();
@@ -43,21 +51,25 @@ class _ShareWithFriendsScreenState extends State<ShareWithFriendsScreen> {
   Future<void> getContacts() async {
     //Make sure we already have permissions for contacts when we get to this
     //page, so we can just retrieve it
+
     final PermissionStatus permissionStatus = await _getPermission();
     if (permissionStatus == PermissionStatus.granted) {
       final Iterable<Contact> contacts = await ContactsService.getContacts();
-      setState(
-        () {
-          _contacts = contacts;
-        },
-      );
+
+      if (mounted) {
+        setState(
+          () {
+            _contacts = contacts;
+          },
+        );
+      }
     }
   }
 
   sendToContact() async {
     final PermissionStatus permissionStatus = await _getPermission();
     if (permissionStatus == PermissionStatus.granted) {
-      ContactName contactName = await Navigator.push(
+      var contactName = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ContactsPage(
@@ -65,11 +77,14 @@ class _ShareWithFriendsScreenState extends State<ShareWithFriendsScreen> {
           ),
         ),
       );
-      setState(() {
-        setContact = true;
-        contactNAME = contactName;
-      });
-      print(contactName.displayName);
+
+      if (contactName != null) {
+        // ContactName contactNam=contactName;
+        setState(() {
+          setContact = true;
+          contactNAME = contactName;
+        });
+      }
     } else {
       //If permissions have been denied show standard cupertino alert dialog
       showDialog(
@@ -89,6 +104,33 @@ class _ShareWithFriendsScreenState extends State<ShareWithFriendsScreen> {
     }
   }
 
+  shareGoldenTicket() async {
+    try {
+      print('start');
+      print(contactNAME?.phoneNo?.replaceAll(' ', ''));
+      GoldenTicketAssignBody goldenTicketAssignBody =
+          GoldenTicketAssignBody.fromJson({
+        'name': contactNAME?.displayName,
+        'phone_number': contactNAME?.phoneNo?.replaceAll(' ', ''),
+      });
+      var r = await goldenTicketApi.v1UsersUserIdAssignGoldenTicket(
+        '${Provider.of<Customer>(context, listen: false).userId}',
+        widget.goldenTicketId.toString(),
+        ticketAssignBody: goldenTicketAssignBody,
+      );
+      sendToscreen(
+        const TicketSharedSuccessFull(
+          phoneNo: '',
+          name: '',
+        ),
+      );
+      print(r?.assignedTo?.name);
+    } catch (e) {
+      print(
+          "Exception when calling goldenTicketApi->v1UsersUserIdAssignGoldenTicket: $e\n");
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -102,7 +144,7 @@ class _ShareWithFriendsScreenState extends State<ShareWithFriendsScreen> {
       child: Scaffold(
         backgroundColor: Color(0xffFFFFFF),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+          padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -151,7 +193,18 @@ class _ShareWithFriendsScreenState extends State<ShareWithFriendsScreen> {
                   ),
                 ),
                 onpressed: () {
-                  sendToscreen(const TicketSharedSuccessFull());
+                  if (contactNAME != null) {
+                    shareGoldenTicket();
+                    sendToscreen(const TicketSharedSuccessFull(
+                      name: '',
+                      phoneNo: '',
+                    ));
+                  } else {
+                    showFlutterToast(
+                      msg: 'Please select a contact',
+                      toastGravity: ToastGravity.CENTER,
+                    );
+                  }
                 },
               )
             ],

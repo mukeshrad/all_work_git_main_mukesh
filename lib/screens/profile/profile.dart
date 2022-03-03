@@ -1,7 +1,6 @@
 import 'package:finandy/modals/customer.dart';
 import 'package:finandy/screens/profile/employmentDetails.dart';
 import 'package:finandy/screens/profile/personalDetails.dart';
-import 'package:finandy/screens/profile/vehicle/vehicleInfo.dart';
 import 'package:finandy/screens/profile/vehicle/vehicleLists.dart';
 import 'package:finandy/utils/appBar.dart';
 import 'package:finandy/utils/expense_bar.dart';
@@ -9,7 +8,7 @@ import 'package:finandy/utils/menuOption.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'address/address_List.dart';
+import 'address/addressInfo.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -22,12 +21,6 @@ class _ProfilePageState extends State<ProfilePage> {
   late double profileProgressint;
 
   //
-  sendToscreen(var page) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page),
-    );
-  }
 
   fetchData() async {
     var name = '${Provider.of<Customer>(context, listen: false).customerName}';
@@ -111,6 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 18.0,
               ),
               profileProgress(
+                context: context,
                 showProfileTile: true,
                 progress: profileProgressint,
                 name:
@@ -124,34 +118,41 @@ class _ProfilePageState extends State<ProfilePage> {
               MenuOption(
                 s: "Personal Details",
                 onTap: () {
-                  sendToscreen(const PersonalDetails());
+                  sendToScreen(
+                    page: PersonalDetails(
+                      profileProgressint: profileProgressint,
+                    ),
+                    buildContext: context,
+                  );
                 },
                 iconData: Icons.account_circle_outlined,
                 iconColor: const Color(0xffDD2E44),
                 showTrailIcon: true,
               ),
-              MenuOption(
-                s: "Education Details",
-                onTap: () {
-                  sendToscreen(const PersonalDetails());
-                },
-                iconData: Icons.school,
-                iconColor: const Color(0xff4BB2FF),
-                showTrailIcon: true,
-              ),
+              // MenuOption(
+              //   s: "Education Details",
+              //   onTap: () {
+              //     sendToscreen(const PersonalDetails());
+              //   },
+              //   iconData: Icons.school,
+              //   iconColor: const Color(0xff4BB2FF),
+              //   showTrailIcon: true,
+              // ),
               MenuOption(
                 iconData: Icons.wallet_travel_outlined,
                 iconColor: const Color(0xff3B88C3),
                 s: "Employment Details",
                 onTap: () {
-                  sendToscreen(const EmploymentDetails());
+                  sendToScreen(
+                      page: const EmploymentDetails(), buildContext: context);
                 },
                 showTrailIcon: true,
               ),
               MenuOption(
                 s: "Address information",
                 onTap: () {
-                  sendToscreen(const AddressList());
+                  sendToScreen(
+                      page: const AddressInfo(), buildContext: context);
                 },
                 iconData: Icons.location_on,
                 iconColor: const Color(0xffF4900C),
@@ -162,19 +163,20 @@ class _ProfilePageState extends State<ProfilePage> {
                 iconData: Icons.car_rental,
                 iconColor: const Color(0xff7333C7),
                 onTap: () {
-                  sendToscreen(VehicleList());
+                  sendToScreen(
+                      page: const VehicleList(), buildContext: context);
                 },
                 showTrailIcon: true,
               ),
-              MenuOption(
-                s: "Financial Details",
-                iconData: Icons.account_balance_outlined,
-                iconColor: const Color(0xff084E6C),
-                onTap: () {
-                  sendToscreen(const VehicleDetails());
-                },
-                showTrailIcon: false,
-              ),
+              // MenuOption(
+              //   s: "Financial Details",
+              //   iconData: Icons.account_balance_outlined,
+              //   iconColor: const Color(0xff084E6C),
+              //   onTap: () {
+              //     sendToscreen(const VehicleDetails());
+              //   },
+              //   showTrailIcon: false,
+              // ),
             ],
           ),
         ),
@@ -211,8 +213,15 @@ profileProgress({
   required String upiId,
   required String profileImg,
   bool? showProfileTile,
+  required BuildContext context,
 }) {
   var p = progress * 100;
+  String? profileImage =
+      Provider.of<Customer>(context, listen: false).profileImage;
+  String initials() {
+    return ((name.isNotEmpty == true ? name[0] : "")).toUpperCase();
+  }
+
   return Card(
     elevation: 2.0,
     shape: RoundedRectangleBorder(
@@ -225,11 +234,13 @@ profileProgress({
         children: [
           showProfileTile == true
               ? ListTile(
-                  leading: const CircleAvatar(
+                  leading: CircleAvatar(
                     backgroundColor: Colors.blueGrey,
                     radius: 25.5,
-                    backgroundImage: NetworkImage(
-                        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHw%3D&w=1000&q=80'),
+                    backgroundImage: profileImage != null
+                        ? NetworkImage(profileImage)
+                        : null,
+                    child: profileImage == null ? Text(initials()) : null,
                   ),
                   title: Text(
                     name,
@@ -238,10 +249,23 @@ profileProgress({
                       fontSize: 16.0,
                     ),
                   ),
-                  subtitle: Text(upiId),
-                  trailing: const Icon(
-                    Icons.edit,
-                    color: Color(0xff084E6C),
+                  // subtitle: Text(upiId),
+                  trailing: InkWell(
+                    onTap: () {
+                      sendToScreen(
+                        page: PersonalDetails(
+                          profileProgressint: progress,
+                        ),
+                        buildContext: context,
+                      );
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.edit,
+                        color: Color(0xff084E6C),
+                      ),
+                    ),
                   ),
                 )
               : Container(),
@@ -278,7 +302,7 @@ profileProgress({
                   ),
                   Text(
                     '${p.toInt()}% Complete',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12.0,
                       // color: Colors.white,
                     ),
@@ -289,14 +313,24 @@ profileProgress({
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                'Complete your profile',
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14.0,
-                  color: Color(0xff084E6C),
-                  decoration: TextDecoration.underline,
+            children: [
+              InkWell(
+                onTap: () {
+                  sendToScreen(
+                    page: PersonalDetails(
+                      profileProgressint: progress,
+                    ),
+                    buildContext: context,
+                  );
+                },
+                child: const Text(
+                  'Complete your profile',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14.0,
+                    color: Color(0xff084E6C),
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               )
             ],
@@ -304,5 +338,12 @@ profileProgress({
         ],
       ),
     ),
+  );
+}
+
+sendToScreen({var page, required BuildContext buildContext}) {
+  Navigator.push(
+    buildContext,
+    MaterialPageRoute(builder: (buildContext) => page),
   );
 }

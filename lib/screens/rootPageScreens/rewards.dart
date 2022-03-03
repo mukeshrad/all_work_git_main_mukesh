@@ -59,7 +59,7 @@ class _TotalRewardsState extends State<TotalRewards> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(
           color: Colors.black
         ),

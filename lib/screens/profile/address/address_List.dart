@@ -26,7 +26,7 @@ class _AddressListState extends State<AddressList> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: const Color(0xffDD2E44),
           onPressed: () {
-            sendToscreen(const AdressInfo());
+            sendToscreen(const AddressInfo());
           },
           child: const Icon(
             Icons.add,

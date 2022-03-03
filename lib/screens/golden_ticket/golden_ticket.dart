@@ -1,6 +1,9 @@
 import 'package:finandy/screens/golden_ticket/Available.dart';
 import 'package:finandy/screens/golden_ticket/Shared.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../../utils/utilityTools.dart';
 
 class GoldenTicket extends StatefulWidget {
   const GoldenTicket({Key? key}) : super(key: key);
@@ -36,7 +39,7 @@ class _GoldenTicketState extends State<GoldenTicket> {
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
-          appBar: buildAppBar(),
+          appBar: buildAppBar(context),
           body: const TabBarView(
             children: <Widget>[
               AvailableGoldenTicket(),
@@ -48,8 +51,11 @@ class _GoldenTicketState extends State<GoldenTicket> {
     );
   }
 
-  AppBar buildAppBar() {
+  AppBar buildAppBar(BuildContext context) {
+    String msg =
+        "0I'm trying to make it where the user is able to change their profile pic inside the app. I'm able to pull the camera and take a picture in flutter. However, the image is not being saved, and inside visual studio code I get the following error: [ERROR:flutter/lib/ui/ui_dart_state.cc(209)] Unhandled Exception: type 'XFile' is not a subtype of type 'PickedFile' in type cast";
     return AppBar(
+      elevation: 0.5,
       backgroundColor: Colors.white,
       iconTheme: const IconThemeData(
         color: Color(0xff084E6C),
@@ -58,6 +64,20 @@ class _GoldenTicketState extends State<GoldenTicket> {
         'Golden Tickets',
         style: TextStyle(color: Colors.black),
       ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            showbottomSheet(buildContext: context, msg: msg);
+          },
+          icon: const Icon(
+            CupertinoIcons.info,
+            color: Colors.black,
+          ),
+        ),
+        SizedBox(
+          width: 20.0,
+        ),
+      ],
       bottom: const TabBar(
         unselectedLabelStyle: TextStyle(
           fontWeight: FontWeight.normal,

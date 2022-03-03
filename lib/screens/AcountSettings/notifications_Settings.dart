@@ -34,8 +34,8 @@ class _NotificationSettingsState extends State<NotificationSettings> {
   //   }
   // }
   putData() async {
-    UserResponse userBody = UserResponse.fromJson({
-      "_id": Provider.of<Customer>(context, listen: false).userId,
+    UsersUserIdPutBody userBody = UsersUserIdPutBody.fromJson({
+      "id": Provider.of<Customer>(context, listen: false).userId,
       'notification_preference': {
         'whatsapp': isWhatsApp,
         'sms': isSMS,
@@ -46,7 +46,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
         '${Provider.of<Customer>(context, listen: false).userId}',
         body: userBody);
     Provider.of<Customer>(context, listen: false)
-        .setCustomer(res2.toJson(), UserState.OTPVerified);
+        .setCustomer(res2, UserState.OTPVerified);
   }
 
   setData() async {

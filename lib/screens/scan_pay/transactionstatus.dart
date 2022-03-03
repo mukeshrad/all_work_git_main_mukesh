@@ -3,13 +3,16 @@ import 'dart:async';
 import 'package:finandy/screens/rootPageScreens/root_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:swagger/api.dart';
 
 var cardId = "15577057378879732";
 var trId = "123";
 enum Response { Success, Pending, Failed }
 
 class TransactionStatus extends StatefulWidget {
-  const TransactionStatus({Key? key}) : super(key: key);
+  TransactionStatus({Key? key, required this.transaction}) : super(key: key);
+
+  UserTransaction transaction;
 
   @override
   State<TransactionStatus> createState() => _TransactionStatus();
@@ -58,24 +61,40 @@ class _TransactionStatus extends State<TransactionStatus> {
       ),
       body: Container(
         margin: const EdgeInsets.only(left: 25, right: 25, top: 30),
-        child: PendingPage(),
+        child: PendingPage(transaction: widget.transaction),
       ),
     );
   }
 }
 
 class PendingPage extends StatefulWidget {
+
+  PendingPage({key, required this.transaction}): super(key: key);
+
+  UserTransaction transaction;
+
   @override
   _PendingPage createState() => _PendingPage();
 }
 
 class _PendingPage extends State<PendingPage> {
   String userName = "Apoorv";
-  double Amount = 100;
-  var TrId = "123";
-  String Date = DateFormat.yMMMd().format(DateTime.now());
-  String Time = DateFormat.jm().format(DateTime.now());
+  double? Amount;
+  String? TrId;
+  String? Date;
+  String? Time;
   String Location = "GZB";
+
+  @override
+  void initState() {
+    UserTransaction tr = widget.transaction;
+    Amount = tr.amount;
+    TrId = tr.id;
+    Date = tr.paymentCompletionTime != null ? DateFormat.yMMMd().format(tr.paymentCompletionTime!) : "--";
+    Time = tr.paymentCompletionTime != null ? DateFormat.jm().format(tr.paymentCompletionTime!) : "--";
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(

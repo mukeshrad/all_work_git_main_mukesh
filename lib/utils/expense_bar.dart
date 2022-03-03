@@ -51,7 +51,7 @@ class ExpenseBar extends StatelessWidget {
                 : Container(
                     decoration: BoxDecoration(
                       // color: color,
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [Colors.red, Colors.pinkAccent],
                         tileMode: TileMode.clamp,
                         transform: GradientRotation(pi / 4),

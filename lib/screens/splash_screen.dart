@@ -1,12 +1,13 @@
+import 'package:finandy/modals/bill.dart';
 import 'package:finandy/modals/card_schema.dart';
 import 'package:finandy/modals/customer.dart';
+import 'package:finandy/services/fetch_user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:finandy/screens/app_purpose.dart';
 import 'package:finandy/screens/rootPageScreens/root_page.dart';
 import 'package:finandy/constants/instances.dart';
-import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({ Key? key }) : super(key: key);
@@ -29,17 +30,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   checkLoggedIn() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    Object? token = preferences.get("token");
-
-    if(token != Null){
-      Object? userId = preferences.get("userId");
+    String? token = preferences.getString("token");
+    String? userId = preferences.getString("userId");
+    if(token != null && userId != null){
       try {
-        apiClient.setAccessToken(token.toString());
-        final res = await userApi.v1UsersUserIdGet(userId.toString());
-        final res1 = await cardsApi.v1UsersUserIdCardsPost(userId.toString());
-        // print(res1.toString());
-        Provider.of<Customer>(context, listen: false).setCustomer(res.toJson(), UserState.LoggedIn);
-        Provider.of<CardSchema>(context, listen: false).setCardDetails(json: res1!.toJson(), name: res.customerName);
+        apiClient.setAccessToken(token);
+        await fetchAndUpdateUserDetails(context, userId, UserState.LoggedIn);
         Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const RootPage()), (route) => false);
       } catch (e) {
         preferences.remove("token");

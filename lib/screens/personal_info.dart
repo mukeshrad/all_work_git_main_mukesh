@@ -1,11 +1,10 @@
+import 'package:finandy/constants/instances.dart';
 import 'package:finandy/constants/texts.dart';
 import 'package:finandy/modals/customer.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
-// import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/src/provider.dart';
-// import 'package:provider/src/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:swagger/api.dart';
@@ -160,6 +159,7 @@ class _PersonalInfo extends State<PersonalInfo> {
                         TextFormField(
                            autovalidateMode: AutovalidateMode.onUserInteraction,
                             decoration: const InputDecoration(
+                               contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                               labelText: naMe,
                             ),
@@ -179,6 +179,7 @@ class _PersonalInfo extends State<PersonalInfo> {
                         TextFormField(
                            autovalidateMode: AutovalidateMode.onUserInteraction,
                         decoration: const InputDecoration(
+                           contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                           border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                           labelText: 'Aadhar Number*',
                         ),
@@ -214,35 +215,43 @@ class _PersonalInfo extends State<PersonalInfo> {
                         },
                       ),
                         const SizedBox(height: 15,),
-                         DropdownButtonFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                           validator: (value) {
-                                if (value == null) {
-                                  return 'Required';
-                                }
-                                return null;
-                              },    
-                          items: const [
-                            DropdownMenuItem(child: Text("Male"), value: "Male",),
-                            DropdownMenuItem(child: Text("Female"), value: "Female",),
-                            DropdownMenuItem(child: Text("None"), value: "None",),
-                          ],
-                          onChanged: (c){
-                            String genderType = c.toString();
-                            setState(() {
-                              gender = genderType;
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            labelText: "Gender*",
-                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                          ),
-                        ),
+                         DropdownButtonHideUnderline(
+                           child: ButtonTheme(
+                             alignedDropdown: true,
+                             child: DropdownButtonFormField(
+                               isExpanded: true,
+                                autovalidateMode: AutovalidateMode.onUserInteraction,
+                               validator: (value) {
+                                    if (value == null) {
+                                      return 'Required';
+                                    }
+                                    return null;
+                                  },    
+                              items: const [
+                                DropdownMenuItem(child: Text("Male"), value: "male",),
+                                DropdownMenuItem(child: Text("Female"), value: "female",),
+                                DropdownMenuItem(child: Text("None"), value: "none",),
+                              ],
+                              onChanged: (c){
+                                String genderType = c.toString();
+                                setState(() {
+                                  gender = genderType;
+                                });
+                              },
+                              decoration: const InputDecoration(
+                                labelText: "Gender*",
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                                // enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                              ),
+                                                   ),
+                           ),
+                         ),
                         const SizedBox(height: 15,),
                         TextFormField(
                           controller: dobController,
                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType: TextInputType.none,
+                          keyboardType: TextInputType.none,onTap: () => _selectDate(context),
                           enabled: true,
                           // initialValue: selectedDate.toString(),
                           readOnly: true,
@@ -253,12 +262,13 @@ class _PersonalInfo extends State<PersonalInfo> {
                                 }
                                 return null;
                               },
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: "Select Date",
-                            border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                             labelText: "Date of Birth*",   
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                             enabled: true,
-                            suffixIcon: IconButton( onPressed: ()=>_selectDate(context), icon: const Icon(Icons.calendar_today_sharp,))  
+                            suffixIcon: Icon(Icons.calendar_today_sharp,) 
                           ),
                         ),
                         const SizedBox(height: 15,),
@@ -275,12 +285,14 @@ class _PersonalInfo extends State<PersonalInfo> {
                                 }
                                 return null;
                               },
-                          decoration: InputDecoration(
+                          onTap: ()=>_getPincode(context),  
+                          decoration:  const InputDecoration(
                             hintText: "Pincode",
-                            border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                             labelText: "Pincode",   
                             enabled: true,
-                            suffixIcon: IconButton( onPressed: ()=>_getPincode(context), icon: const Icon(Icons.gps_fixed,))  
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            suffixIcon: Icon(Icons.gps_fixed,)  
                           ),
                         ),
                     ],
@@ -297,15 +309,33 @@ class _PersonalInfo extends State<PersonalInfo> {
                           } else {
                             if(formKey.currentState!.validate()){
                              formKey.currentState!.save();
-                             final signature = await SmsAutoFill().getAppSignature;
                              context.read<Customer>().setPersonalInfo(
                                 nm: name.trim(),
                                 // address: position!.toJson(),
-                                adh: aadhar,
+                                adh: aadhar.trim(),
                                 dateTime: selectedDate,
                                 gen: gender
                                );
-                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => const OTPverify(fromPage: "pinfo",)));
+                               try {
+                                 AadharGenerateOTPBody generateOTPBody = AadharGenerateOTPBody.fromJson({
+                                      'entered_name': name.trim(),
+                                      'aadhaar_number': aadhar.trim(),
+                                      'is_consented': true,
+                                      'consent_text': "lorem ipsum",
+                                      'consent_time': (DateTime.now().millisecondsSinceEpoch/1000).toString()
+                                  });
+                                  SharedPreferences preferences = await SharedPreferences.getInstance();
+                                 String? userid = preferences.getString('userId');
+                                 String? token = preferences.getString('token');
+                                 apiClient.setAccessToken(token!);
+                                 
+                                 final res3 = await aadharVerificationApi.v1AadharVerificationOTPRequest(userid!, generateOTPBody: generateOTPBody);
+                                 final signature = await SmsAutoFill().getAppSignature;
+                                 print(signature);
+                                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => OTPverify(fromPage: "pinfo", accessKey: res3!.accessKey,))); 
+                               } catch (e) {
+                                 print(e.toString());
+                               }
                             }
                             }
                           },

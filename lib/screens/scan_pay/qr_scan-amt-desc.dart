@@ -1,76 +1,32 @@
 import 'package:finandy/constants/instances.dart';
+import 'package:finandy/modals/card_schema.dart';
 import 'package:finandy/modals/require.dart';
 import 'package:finandy/screens/scan_pay/qr_scan-enter-pin.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swagger/api.dart';
 
 class PayScreen extends StatefulWidget {
-  String? value;
-  PayScreen({Key? key, required this.value}) : super(key: key);
+  Map mercDetails;
+  PayScreen({Key? key, required this.mercDetails}) : super(key: key);
 
   @override
-  State<PayScreen> createState() => _PayScreen(value);
+  State<PayScreen> createState() => _PayScreen();
 }
 
 //
 class _PayScreen extends State<PayScreen> {
-  String? value;
-  _PayScreen(this.value);
-  RegExp regExpupiid = RegExp(
-    r":\/\/pay\?pa=(\w+)@(\w+)&",
-    caseSensitive: false,
-    multiLine: false,
-  );
-  late String UPIID = regExpupiid.stringMatch(value!).toString().substring(10);
-  late String _UPIID = UPIID.substring(0, UPIID.length - 1);
-  RegExp regExpupiname = RegExp(
-    r";pn=(\w+)\s(\w+)\s&",
-    caseSensitive: false,
-    multiLine: false,
-  );
-  String _upiname = "XYZ";
-  // late String upiname = regExpupiname.stringMatch(value).toString().substring(4);
-  // late String _upiname = upiname.substring(0, upiname.length - 3);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title:
-            Text("Pay to ${_upiname}", style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        centerTitle: false,
-      ),
-      body: Container(
-        margin:
-            const EdgeInsets.only(left: 25, right: 25, top: 30, bottom: 0.0),
-        child: PageForm(value_: [_UPIID, _upiname]),
-      ),
-    );
-  }
-}
-
-class PageForm extends StatefulWidget {
-  final List<String> value_;
-  const PageForm({Key? key, required this.value_}) : super(key: key);
-  @override
-  _PageFormState createState() => _PageFormState();
-}
-
-class _PageFormState extends State<PageForm> {
-  // List<String> value_;
-  // _PageFormState(this.value_);
   bool isButtonActive = false;
   late TextEditingController controller;
-
+  late int? monthlyLimit;
   @override
   void initState() {
     super.initState();
+    mercDetails = widget.mercDetails;
+    monthlyLimit =
+        Provider.of<CardSchema>(context, listen: false).limits!.monthly;
     locationHandler(_getUserPosition);
     controller = TextEditingController();
     controller.addListener(() {
@@ -94,120 +50,180 @@ class _PageFormState extends State<PageForm> {
   void _getUserPosition() async {
     Position userLocation = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      position = userLocation;
-    });
-  }
-
-  createTransaction(value_) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    Object? token = preferences.get("token");
-    apiClient.addDefaultHeader("Client-Secret", "");
-    apiClient.setAccessToken(token.toString());
-    print(token.toString());
-    var cardId = "61e3fb775e346c001d2404ca";
-    final CardIdTransactionsBody body_ = CardIdTransactionsBody.fromJson({
-      "merchant_upi_id": value_["upiId"],
-      "merchant_bank_account": "786655824565",
-      "merchant_ifsc_code": "dsv",
-      "merchant_category_code": "1761",
-      "amount": value_["amount"],
-      "location": position,
-    });
-    try {
-      var result = await transactionInstance
-          .v1CardsCardIdTransactionsPost(cardId, body: body_);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => Screen3(Screen2Data: SendData)));
-      print("result:${result.toString()}");
-    } catch (e) {
-      print(
-          "Exception when calling TransactionsApi->v1CardsCardIdTransactionsPost: $e\n");
+    if (mounted) {
+      setState(() {
+        position = userLocation;
+      });
     }
   }
 
-  late Map SendData;
+  Widget handleDefaultAvatar() {
+    String x = mercDetails["name"];
+    List<String> nameparts = x.split(" ");
+    String initials;
+    if (nameparts.isEmpty) {
+      initials = "AZ";
+    } else {
+      initials = nameparts[0][0].toUpperCase() +
+          nameparts[nameparts.length - 1][0].toUpperCase();
+    }
+
+    if (mercDetails["image"] != null) {
+      return const CircleAvatar(
+          // backgroundImage: NetworkImage(mercDetails["image"]),
+          );
+    } else {
+      return CircleAvatar(
+        backgroundColor: Colors.blueAccent,
+        child: Text(initials),
+      );
+    }
+  }
+
+  createTransaction(ctx) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    Object? token = preferences.get("token");
+    apiClient.setAccessToken(token as String);
+    String cardId = Provider.of<CardSchema>(context, listen: false).id ?? "";
+    final CardIdTransactionsBody body_ = CardIdTransactionsBody.fromJson({
+      "merchant_upi_id": ctx["upi_id"],
+      "merchant_category_code": ctx["merchantCategoryCode"],
+      "amount": ctx["amount"],
+      'location': position,
+      'qr_code': ctx["qr_code"],
+      "merchantName": ctx["name"]
+    });
+    try {
+      UserTransaction? transaction = await transactionApi.v1CardsCardIdTransactionsPost(cardId,
+          body: body_);
+      if (transaction == null) {
+        throw Exception("Create transaction result is empty");
+      }
+      ctx["trId"] = transaction.id;
+      print("Final Result --> $ctx");
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => EnterPin(tctDetails: ctx)));
+    } catch (e) {
+      print(
+          "Exception when calling TransactionsApi->v1CardsCardIdTransactionsPost: $e\n");
+      rethrow;
+    }
+  }
+
   final _formKey = GlobalKey<FormState>();
-  double _Amount = 0;
-  var _Description;
+  double amt = 0;
+  var desc;
+  late Map mercDetails;
+
   @override
   Widget build(BuildContext context) {
-    return Form(
-      // autovalidateMode: AutovalidateMode.always,
-      key: _formKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.assignment_turned_in_outlined),
-              title: Text(widget.value_[1]),
-              subtitle: Text(widget.value_[0]),
-            ),
-          ),
-          SizedBox(height: 20),
-          TextFormField(
-            decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Enter Amount',
-                labelText: 'Amount',
-                alignLabelWithHint: true),
-            keyboardType: TextInputType.number,
-            controller: controller,
-            onChanged: (amountValue) {
-              setState(() {
-                _Amount = double.parse(amountValue);
-              });
-            },
-            validator: (amountValue) {
-              if (amountValue!.isEmpty) {
-                return "Please enter Amount";
-              }
-              return null;
-            },
-          ),
-          SizedBox(height: 20),
-          TextFormField(
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: "Description",
-              hintText: "Description",
-              alignLabelWithHint: true,
-              // alignLabelWithHint:
-            ),
-            onSaved: (value) {
-              _Description = value;
-            },
-            maxLines: 5,
-          ),
-          Spacer(),
-          Flexible(
-            child: Container(
-              margin: const EdgeInsets.only(top: 50),
-              child: ElevatedButton(
+    print('in $mercDetails');
+    String name = mercDetails["name"] ?? "Default Name";
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
+        title:
+            Text("Pay to $name", style: const TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        centerTitle: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 30.0,
+          vertical: 15.0,
+        ),
+        child: Form(
+          // autovalidateMode: AutovalidateMode.always,
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Expanded(
+                child: ListView(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(7.0),
+                        border: Border.all(
+                          color: const Color(0xffF0F0F0),
+                        ),
+                      ),
+                      child: ListTile(
+                        leading: handleDefaultAvatar(),
+                        title: Text(
+                          mercDetails["name"],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                        subtitle: Text(
+                          mercDetails["upi_id"],
+                          style: const TextStyle(
+                            fontSize: 14.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Color(0xffF0F0F0), width: 1.5),
+                        ),
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter Amount',
+                        labelText: 'Amount',
+                        alignLabelWithHint: true,
+                      ),
+                      keyboardType: TextInputType.number,
+                      controller: controller,
+                      onChanged: (amountValue) {
+                        setState(() {
+                          amt = double.parse(amountValue);
+                        });
+                      },
+                      validator: (amountValue) {
+                        if (amountValue!.isEmpty) {
+                          return "Please enter Amount";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Color(0xffF0F0F0), width: 1.5),
+                        ),
+                        border: OutlineInputBorder(),
+                        labelText: "Description",
+                        hintText: "Description",
+                        alignLabelWithHint: true,
+                        // alignLabelWithHint:
+                      ),
+                      onSaved: (value) {
+                        desc = value;
+                      },
+                      maxLines: 5,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: ElevatedButton(
                   onPressed: isButtonActive
                       ? () {
-                          final Map someMap = {
-                            "upiId": widget.value_[0],
-                            "upiname": widget.value_[1],
-                            "amount": _Amount,
-                            "location": position
-                          };
-                          setState(() {
-                            SendData = someMap;
-                            isButtonActive = false;
-                          });
-                          print(SendData);
-                          print(position.toString());
-                          print(widget.value_);
-                          createTransaction(SendData);
-                          // if(_Amount.isFinite){
-
-                          // }
-                          controller.clear();
+                          doTransaction();
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -217,16 +233,86 @@ class _PageFormState extends State<PageForm> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Text(
-                        "Pay",
-                        style: TextStyle(fontSize: 20),
-                      ))),
-            ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text(
+                      "Pay",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
+  }
+
+  void monthlyLimitSheet() {
+    showModalBottomSheet<dynamic>(
+        context: context,
+        builder: (context) => Wrap(alignment: WrapAlignment.center, children: [
+              Column(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_drop_down_circle),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  const Text(
+                    "Monthly Limit Exceeded",
+                    textAlign: TextAlign.center,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(15.0),
+                          child: Text(
+                            "Please try again",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        )),
+                  ),
+                ],
+              ),
+            ]));
+  }
+
+  doTransaction() {
+    try {
+      final Map someMap = {
+        "upi_id": mercDetails["upi_id"],
+        "name": mercDetails["name"],
+        "merchantCategoryCode": mercDetails["merchantCategoryCode"],
+        "qr_code": mercDetails["qr_code"],
+        "image": mercDetails["image"],
+        "amount": amt,
+        "location": position,
+        "Description": desc
+      };
+
+      setState(() {
+        isButtonActive = false;
+      });
+      if (monthlyLimit != null && amt > monthlyLimit!) {
+        monthlyLimitSheet();
+      } else {
+        createTransaction(someMap);
+      }
+      controller.clear();
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }

@@ -1,6 +1,12 @@
+import 'package:finandy/modals/customer.dart';
 import 'package:finandy/screens/golden_ticket/share_with_friends.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+import 'package:swagger/api.dart';
+
+import '../../constants/instances.dart';
+import '../profile/profile.dart';
 
 class AvailableGoldenTicket extends StatefulWidget {
   const AvailableGoldenTicket({Key? key}) : super(key: key);
@@ -10,11 +16,18 @@ class AvailableGoldenTicket extends StatefulWidget {
 }
 
 class _AvailableGoldenTicketState extends State<AvailableGoldenTicket> {
-  sendToscreen(var page) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page),
-    );
+  late Future<List<GoldenTicketResponse>?> goldenTickets;
+  Future<List<GoldenTicketResponse>?> getGoldenTicket() async {
+    return await goldenTicketApi.v1userGoldenTicketGet(
+            '${Provider.of<Customer>(context, listen: false).userId}') ??
+        List.empty();
+  }
+
+  @override
+  void initState() {
+    goldenTickets = getGoldenTicket();
+    // getdata();
+    super.initState();
   }
 
   @override
@@ -24,26 +37,81 @@ class _AvailableGoldenTicketState extends State<AvailableGoldenTicket> {
         horizontal: 30.0,
         vertical: 10.0,
       ),
-      child: ListView(
+      child:
+          // FutureBuilder<List<GoldenTicketResponse>?>(
+          //   future: goldenTickets,
+          //   builder: (context, snapshot) {
+          //     if (snapshot.data == null) {
+          //       return const Center(
+          //         child: Text(
+          //           "Ohh Snap, reload the Page",
+          //           style: TextStyle(
+          //             fontWeight: FontWeight.w500,
+          //             fontSize: 16.0,
+          //           ),
+          //           textAlign: TextAlign.center,
+          //         ),
+          //       );
+          //     }
+          //     switch (snapshot.connectionState) {
+          //       case ConnectionState.none:
+          //         return const Center(child: Text("Oh"));
+          //       case ConnectionState.active:
+          //       case ConnectionState.waiting:
+          //         return const Center(child: CircularProgressIndicator());
+          //       case ConnectionState.done:
+          //         if (snapshot.data!.isEmpty) {
+          //           return const Center(
+          //             child: Text(
+          //               "Looks Like you don't have any Golden Ticket that you can share with your friends",
+          //               textAlign: TextAlign.center,
+          //               style: TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 16.0,
+          //               ),
+          //             ),
+          //           );
+          //         }
+          //
+          //         return ListView.builder(
+          //             itemCount: snapshot.data!.length,
+          //             itemBuilder: (context, index) {
+          //               if (snapshot.data![index].assignedTo!.name == null ||
+          //                   snapshot.data![index].assignedTo!.name == '') {
+          //                 return Container();
+          //               } else {
+          //                 return buildCard(
+          //                   cardNo: '${snapshot.data![index].ticketNumber}',
+          //                   valid_Date: '06/30',
+          //                   onTapShare: () {
+          //                     sendToScreen(
+          //                       page: ShareWithFriendsScreen(
+          //                         goldenTicketId: snapshot.data![index].id,
+          //                       ),
+          //                       buildContext: context,
+          //                     );
+          //                   },
+          //                   showShareButton: true,
+          //                 );
+          //               }
+          //             });
+          //       default:
+          //         return Text("Oops");
+          //     }
+          //   },
+          // ),
+          ListView(
         children: [
-          const SizedBox(
-            height: 20.0,
-          ),
           buildCard(
-              cardNo: '1234 5678 9012 3456',
-              valid_Date: '06/30',
-              onTapShare: () {
-                sendToscreen(const ShareWithFriendsScreen());
-              },
-              showShareButton: true),
-          const SizedBox(
-            height: 20,
-          ),
-          buildCard(
-            cardNo: '1234 5678 9012 3456',
+            cardNo: '12345689789789',
             valid_Date: '06/30',
             onTapShare: () {
-              sendToscreen(const ShareWithFriendsScreen());
+              sendToScreen(
+                page: const ShareWithFriendsScreen(
+                  goldenTicketId: '123564545465',
+                ),
+                buildContext: context,
+              );
             },
             showShareButton: true,
           ),

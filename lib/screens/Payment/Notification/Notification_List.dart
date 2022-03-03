@@ -62,16 +62,15 @@ class _NotificationList extends State<NotificationListPage> {
     try {
       var response = await userApi
           .v1UsersNotificationGet(userId);
-      print("result:${response.notifications![0].userId}");
+      print("result:${response}");
       setState(() {
         notificationList =  response.notifications!;
       });
 
-      print("resultNotification:${response.notifications}");
 
     } catch (e) {
       print(
-          "Exception when calling TransactionsApi->v1CardsCardIdTransactionsPost: $e\n");
+          "Exception when calling NotificationApi->v1Notification: $e\n");
     }
   }
 
@@ -179,7 +178,7 @@ class _NotificationList extends State<NotificationListPage> {
                 ),
                 Container(
                   child: Text(
-                   '2022-02-16',
+                    '2022-02-16',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     softWrap: false,

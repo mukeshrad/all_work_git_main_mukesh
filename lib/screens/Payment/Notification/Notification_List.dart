@@ -49,9 +49,13 @@ class _NotificationList extends State<NotificationListPage> {
         _isLoading = false;
       });
       setState(() {
-        notificationList =  response.notifications;
+        notificationList = response.notifications;
       });
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      notificationList = [];
       print(
           "Exception when calling NotificationApi->v1Notification: $e\n");
     }
@@ -88,6 +92,8 @@ class _NotificationList extends State<NotificationListPage> {
           child: CircularProgressIndicator(),),
       )
     ) :
+    notificationList.length == 0 ? const Expanded(
+      child: Center( child : Text("No data found"))) :
       Expanded(
         child: ListView.builder(
           padding: const EdgeInsets.only(top: 20),

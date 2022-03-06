@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,56 +15,42 @@ class NotificationListPage extends StatefulWidget {
 class _NotificationList extends State<NotificationListPage> {
 
   List<Notifications> notificationList = [];
+  var getUserID = "";
+  var _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-
-    // //:- Add TODO for actual API integration.
-    // var item1 = NotificatioListModal();
-    // item1.date = "10:30 AM";
-    // item1.title = "Your Password have been successfully changed.";
-    // item1.isNew = true;
-    // notificationList.add(item1);
-    //
-    // //:- Add TODO for actual API integration.
-    // for (var i = 0; i < 6; i++) {
-    //   var item1 = NotificatioListModal();
-    //   item1.date = "10:30 AM";
-    //   item1.title = "You received Rs 1 in your Everyday Card";
-    //   item1.isNew = false;
-    //   notificationList.add(item1);
-    // }
-    // setState(() {});
-
     getUserDetails();
-
   }
 
-  var userId = "";
-  getUserDetails() async {
+  void getUserDetails() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var id = preferences.get("userId");
     print("user ID : $id");
     setState(() {
-      userId = id.toString();
+      getUserID = id.toString();
+      getNotification();
     });
-    getNotification();
   }
-  getNotification() async {
+  void getNotification() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     Object? token = preferences.get("token");
     apiClient.addDefaultHeader("Client-Secret", "");
     apiClient.setAccessToken(token.toString());
-    print(token.toString());
+    // print(token.toString());
+    setState(() {
+      _isLoading = true;
+    });
     try {
       var response = await notificationApi
-          .v1UsersNotificationGet(userId);
-      print("result:${response}");
+          .v1UsersNotificationGet(getUserID);
+      setState(() {
+        _isLoading = false;
+      });
       setState(() {
         notificationList =  response.notifications;
       });
-
     } catch (e) {
       print(
           "Exception when calling NotificationApi->v1Notification: $e\n");
@@ -79,62 +62,48 @@ class _NotificationList extends State<NotificationListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: const BackButton(color: Colors.black),
-          title: const Text(
-            "Notification",
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
+        appBar: myAppBar(),
         body: Column(
           children: [
-            Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.only(top: 20),
-                  itemCount: notificationList.length,
-                  itemBuilder: (context, index) {
-                    return ContactsView(context, index);
-                  },
-                )),
-            Container(
-              height: 60,
-              child: Column(
-                children: [
-                  Container(
-                    height: 1,
-                    color: Colors.grey.withOpacity(0.5),
-                  ),
-                  Expanded(
-                      child: Center(
-                        child: TextButton(
-                          onPressed: () {
-                          },
-                          child: const Text("View All Notifications",
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: false,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.normal,
-                                decoration: TextDecoration.underline,
-                              )),
-                        ),
-                      ))
-                ],
-              ),
-            )
+            notificationListContainer(context),
           ],
         ));
   }
 
-  Widget ContactsView(BuildContext context, int index) {
+  AppBar myAppBar(){
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: const BackButton(color: Colors.black),
+      title: const Text(
+        "Notification",
+        style: TextStyle(color: Colors.black),
+      ),
+    );
+  }
+  Widget notificationListContainer(BuildContext context){
+    return  _isLoading == true ?  Expanded(
+      child: Center(
+        child: SizedBox(height: 50,width: 50,
+          child: CircularProgressIndicator(),),
+      )
+    ) :
+      Expanded(
+        child: ListView.builder(
+          padding: const EdgeInsets.only(top: 20),
+          itemCount: notificationList.length,
+          itemBuilder: (context, index) {
+            return notificationItem(context, index);
+          },
+        ));
+  }
+  Widget notificationItem(BuildContext context, int index) {
+
     var item = notificationList[index];
 
-    var date = item.created.toString();
-    DateTime dt = DateTime.parse(date);
-    String newDate = DateFormat("yyyy-MM-dd").format(dt);
+    var getdate = item.created.toString();
+    DateTime dateTime = DateTime.parse(getdate);
+    String createData = DateFormat("yyyy-MM-dd").format(dateTime);
 
     return GestureDetector(
       onTap: () {
@@ -144,8 +113,6 @@ class _NotificationList extends State<NotificationListPage> {
         margin: const EdgeInsets.only(left: 30, right: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          // mainAxisAlignment: MainAxisAlignment.spaceAround,
-
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +120,6 @@ class _NotificationList extends State<NotificationListPage> {
               children: [
                 Container(
                   margin: const EdgeInsets.only(top: 5),
-
                   decoration: BoxDecoration(
                     color: item.seen != null
                         ? Colors.red.withOpacity(1)
@@ -162,7 +128,6 @@ class _NotificationList extends State<NotificationListPage> {
                   ),
                   height: 10,
                   width: 10,
-                  // child: const Center(child: const Text("A",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.normal),),),
                 ),
                 const SizedBox(
                   width: 20,
@@ -183,7 +148,7 @@ class _NotificationList extends State<NotificationListPage> {
                 ),
                 Container(
                   child: Text(
-                    newDate.toString(),
+                    createData.toString(),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     softWrap: false,
@@ -206,5 +171,6 @@ class _NotificationList extends State<NotificationListPage> {
       ),
     );
   }
+
 }
 
